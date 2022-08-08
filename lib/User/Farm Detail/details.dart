@@ -350,16 +350,6 @@ Widget FarmDetails() {
                   Text(
                       "This is located in a great spot to shops and bars, very quite location",
                       style: normalStyle),
-                  Row(
-                    children: [
-                      Spacer(),
-                      Text(
-                        "Replay",
-                        style: TextStyle(
-                            fontFamily: 'NotoSans-Bold', color: rPrimarycolor),
-                      ),
-                    ],
-                  )
                 ],
               ),
             ),
@@ -555,7 +545,7 @@ CallHotel() async {
   }
 }
 
-Widget Details() { 
+Widget Details() {
   return Column(
     children: [
       Details_item("Type:", "Farm Type"),

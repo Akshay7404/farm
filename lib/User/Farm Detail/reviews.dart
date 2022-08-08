@@ -1,8 +1,11 @@
-// ignore_for_file: prefer_const_constructors
+// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
 import 'package:flutter/material.dart';
 import 'package:resortbooking/User/Common/Color.dart';
+import 'package:resortbooking/User/Common/Constant.dart';
 import 'package:resortbooking/User/Common/Style.dart';
+import 'package:like_button/like_button.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class reviews extends StatefulWidget {
   const reviews({Key? key}) : super(key: key);
@@ -74,11 +77,19 @@ class _reviewsState extends State<reviews> {
                   Row(
                     children: [
                       Spacer(),
-                      Text(
-                        "Replay",
-                        style: TextStyle(
-                            fontFamily: 'NotoSans-Bold', color: rPrimarycolor),
+                      LikeButton(
+                        likeBuilder: (isLiked) {
+                          return FaIcon(FontAwesomeIcons.thumbsUp,
+                              color: isLiked ? rPrimarycolor : Colors.black);
+                        },
                       ),
+                      widthSpace(10),
+                      LikeButton(
+                        likeBuilder: (isLiked) {
+                          return FaIcon(FontAwesomeIcons.thumbsDown,
+                              color: isLiked ? Colors.red : Colors.black);
+                        },
+                      )
                     ],
                   )
                 ],

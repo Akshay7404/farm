@@ -78,6 +78,7 @@ Widget appTextField({
           hintStyle: textfieldStyle,
           errorStyle: errorTextfieldStyle,
           suffixIcon: suffixIcon,
+          
           focusedBorder: OutlineInputBorder(
               borderSide: BorderSide.none,
               borderRadius: BorderRadius.circular(8)),

@@ -1,10 +1,16 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, non_constant_identifier_names
 
+import 'dart:io';
+import 'package:checkbox_grouped/checkbox_grouped.dart';
 import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
 import 'package:bouncing_widget/bouncing_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:resortbooking/Admin/Bottom%20Screen/AddFarm2.dart';
 import 'package:resortbooking/Admin/Google%20map/GoogleMap.dart';
+import 'package:resortbooking/Admin/Property/Cottage.dart';
+import 'package:resortbooking/Admin/Property/FarmHouse.dart';
+import 'package:resortbooking/Admin/Property/Tent.dart';
+import 'package:resortbooking/Admin/Property/Villa.dart';
+import 'package:resortbooking/User/Booking/FarmBooking.dart';
 import 'package:resortbooking/User/Common/Color.dart';
 import 'package:resortbooking/User/Common/Constant.dart';
 import 'package:resortbooking/User/Common/Navigators.dart';
@@ -25,22 +31,25 @@ class _AddFarmState extends State<AddFarm> {
   final mobile_control = TextEditingController();
   final property_control = TextEditingController();
   final address_control = TextEditingController();
-  final guestCapacity = TextEditingController();
-  final numberofbed = TextEditingController();
-  final numberofbath = TextEditingController();
-  final numberofchair = TextEditingController();
-  final Swimmingpoll = TextEditingController();
-  final farmsize = TextEditingController();
-  List<String> AreaList = [
-    "Farm House",
-    "Villa",
-    "Service Apartment",
-    "Resort",
-    "Cottage",
-    "Tent"
-  ];
+
+  List<String> AreaList = ["Farm House", "Villa", "Cottage", "Tent"];
   String? selectedValue;
   final _form = GlobalKey<FormState>();
+
+  final ImagePicker imagePicker = ImagePicker();
+  List<XFile>? imageFileList = [];
+
+  void selectImages() async {
+    final List<XFile>? selectedImages = await imagePicker.pickMultiImage();
+    if (selectedImages!.isNotEmpty) {
+      imageFileList!.addAll(selectedImages);
+    }
+
+    setState(() {});
+  }
+
+  ScrollController scrollController = ScrollController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -86,7 +95,7 @@ class _AddFarmState extends State<AddFarm> {
                 ),
                 heightSpace(10),
                 Text("Enter Your Mobile Number", style: normalStyle),
-                widthSpace(8),
+                heightSpace(8),
                 Container(
                   decoration: BoxDecoration(boxShadow: [
                     BoxShadow(
@@ -186,146 +195,53 @@ class _AddFarmState extends State<AddFarm> {
                     ]),
                     child: AreaItem()),
                 heightSpace(20),
-                Text("Guest Capacity", style: normalStyle),
-                heightSpace(8),
-                Container(
-                  decoration: BoxDecoration(boxShadow: [
-                    BoxShadow(
-                        color: Colors.black12,
-                        blurRadius: 20,
-                        offset: Offset(5, 5)),
-                  ]),
-                  child: appTextField(
-                    textEditingController: guestCapacity,
-                    hintText: "Enter Number Of Guest Allowed",
-                    keyboardType: TextInputType.phone,
-                    validation: (value) {
-                      if (value!.isEmpty) {
-                        return 'Enter Guest Capacity';
-                      }
-                    },
-                  ),
-                ),
+                if (selectedValue == "Farm House") FarmHouse(),
+                if (selectedValue == "Villa") Villa(),
+                if (selectedValue == "Cottage") Cottage(),
+                if (selectedValue == "Tent") Tent(),
                 heightSpace(20),
-                Text("Number Of Beds", style: normalStyle),
-                heightSpace(8),
-                Container(
-                  decoration: BoxDecoration(boxShadow: [
-                    BoxShadow(
-                        color: Colors.black12,
-                        blurRadius: 20,
-                        offset: Offset(5, 5)),
-                  ]),
-                  child: appTextField(
-                    textEditingController: numberofbed,
-                    hintText: "Enter Number Of Beds",
-                    keyboardType: TextInputType.phone,
-                    validation: (value) {
-                      if (value!.isEmpty) {
-                        return 'Enter Number Of Beds';
-                      }
-                    },
-                  ),
+                Text("Property Photos",
+                    style:
+                        TextStyle(fontFamily: 'NotoSans-Medium', fontSize: 18)),
+                Text("Upload Images", style: normalStyle),
+                TextButton(
+                  child:
+                      Text("Add Image", style: TextStyle(color: rPrimarycolor)),
+                  onPressed: () {
+                    selectImages();
+                  },
                 ),
-                heightSpace(20),
-                Text("Number Of Bathrooms", style: normalStyle),
-                heightSpace(8),
-                Container(
-                  decoration: BoxDecoration(boxShadow: [
-                    BoxShadow(
-                        color: Colors.black12,
-                        blurRadius: 20,
-                        offset: Offset(5, 5)),
-                  ]),
-                  child: appTextField(
-                    textEditingController: numberofbath,
-                    hintText: "Enter Number Of Bathrooms",
-                    keyboardType: TextInputType.phone,
-                    validation: (value) {
-                      if (value!.isEmpty) {
-                        return 'Enter Number Of Bathrooms';
-                      }
-                    },
-                  ),
-                ),
-                heightSpace(20),
-                Text("Number Of Chairs", style: normalStyle),
-                heightSpace(8),
-                Container(
-                  decoration: BoxDecoration(boxShadow: [
-                    BoxShadow(
-                        color: Colors.black12,
-                        blurRadius: 20,
-                        offset: Offset(5, 5)),
-                  ]),
-                  child: appTextField(
-                    textEditingController: numberofchair,
-                    hintText: "Enter Number Of Chairs",
-                    keyboardType: TextInputType.phone,
-                    validation: (value) {
-                      if (value!.isEmpty) {
-                        return 'Enter Number Of Chairs';
-                      }
-                    },
-                  ),
-                ),
-                heightSpace(20),
-                Text("Swimming Pool", style: normalStyle),
-                heightSpace(8),
-                Container(
-                  decoration: BoxDecoration(boxShadow: [
-                    BoxShadow(
-                        color: Colors.black12,
-                        blurRadius: 20,
-                        offset: Offset(5, 5)),
-                  ]),
-                  child: appTextField(
-                    textEditingController: Swimmingpoll,
-                    hintText: "Common / Private",
-                    validation: (value) {
-                      if (value!.isEmpty) {
-                        return 'Common / Private';
-                      }
-                    },
-                  ),
-                ),
-                heightSpace(20),
-                Text("Farm Size", style: normalStyle),
-                heightSpace(8),
-                Container(
-                  decoration: BoxDecoration(boxShadow: [
-                    BoxShadow(
-                        color: Colors.black12,
-                        blurRadius: 20,
-                        offset: Offset(5, 5)),
-                  ]),
-                  child: appTextField(
-                    textEditingController: farmsize,
-                    hintText: "Sq Feet / Sq Yard / Vigha ect.",
-                    validation: (value) {
-                      if (value!.isEmpty) {
-                        return 'Enter Farm Size';
-                      }
-                    },
-                  ),
-                ),
+                GridView.builder(
+                    controller: scrollController,
+                    shrinkWrap: true,
+                    itemCount: imageFileList!.length,
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2),
+                    itemBuilder: (BuildContext context, int index) {
+                      return Container(
+                        margin: EdgeInsets.all(5),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: Image.file(
+                            File(imageFileList![index].path),
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      );
+                    }),
                 BouncingWidget(
                   child: Container(
                     height: 50,
                     margin: EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.all(Radius.circular(32)),
-                      color: rPrimarycolor,
-                    ),
+                        borderRadius: BorderRadius.all(Radius.circular(32)),
+                        color: rPrimarycolor),
                     child: Center(
-                      child: Text("Next", style: buttonStyle),
+                      child: Text("Submit", style: buttonStyle),
                     ),
                   ),
                   onPressed: () {
-                    if (_form.currentState!.validate()) {
-                      pushScreen(context, () => AddFarm2());
-                    } else
-                      null;
+                    if (_form.currentState!.validate()) {}
                   },
                 )
               ],

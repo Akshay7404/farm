@@ -36,8 +36,8 @@ class _HomeScreenState extends State<HomeScreen> {
             InkWell(
               onTap: () => pushScreen(context, () => MyFarm()),
               child: Container(
-                margin: EdgeInsets.only(top: 20),
-                height: 130,
+                margin: EdgeInsets.all(10),
+                height: 120,
                 decoration: BoxDecoration(
                     boxShadow: [
                       BoxShadow(

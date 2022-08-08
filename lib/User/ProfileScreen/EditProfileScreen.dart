@@ -351,32 +351,7 @@ class _EditProfileState extends State<EditProfile> {
                     ),
                   ),
                   heightSpace(15),
-                  Container(
-                      padding: EdgeInsets.only(left: 18),
-                      child: Text("Address",
-                          style: TextStyle(color: Colors.grey))),
-                  heightSpace(5),
-                  Container(
-                    decoration: BoxDecoration(
-                      boxShadow: [
-                        BoxShadow(
-                            color: Colors.black12,
-                            blurRadius: 25,
-                            offset: const Offset(10, 10)),
-                      ],
-                    ),
-                    child: appTextField(
-                      textEditingController: AddressController,
-                      hintText: "Enter your address",
-                      validation: (value) {
-                        if (value!.isEmpty) {
-                          return 'Please enter your address';
-                        }
-                      },
-                    ),
-                  ),
-                  SizedBox(height: 12),
-                  BouncingWidget(
+                   BouncingWidget(
                     onPressed: () {
                       if (_form.currentState!.validate()) {
                       } else {

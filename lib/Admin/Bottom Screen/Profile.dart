@@ -5,6 +5,7 @@ import 'package:resortbooking/Admin/Pricacy%20Policy/PrivicyPolicyAdmin.dart';
 import 'package:resortbooking/Admin/Profile%20Screen/ChangePasswordAdmin.dart';
 import 'package:resortbooking/Admin/Profile%20Screen/EditProfileAdmin.dart';
 import 'package:resortbooking/Admin/Profile%20Screen/InviteFriend.dart';
+import 'package:resortbooking/Admin/User%20Revirws/UserReview.dart';
 import 'package:resortbooking/User/Common/Color.dart';
 import 'package:resortbooking/User/Common/Constant.dart';
 import 'package:resortbooking/User/Common/Style.dart';
@@ -110,6 +111,30 @@ class _ProfileState extends State<Profile> {
                       Icon(Icons.lock, color: rGrey),
                       SizedBox(width: 15),
                       Text("Change Password",
+                          style: TextStyle(fontFamily: 'NotoSans-Medium')),
+                    ],
+                  ),
+                ),
+              ),
+              thinAppDevider(),
+              Container(
+                margin: EdgeInsets.only(top: 10, bottom: 10),
+                child: InkWell(
+                  onTap: () {
+                    pushNewScreen(
+                      context,
+                      screen: UserReview(),
+                      withNavBar: false,
+                      pageTransitionAnimation:
+                          PageTransitionAnimation.cupertino,
+                    );
+                  },
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Icon(Icons.reviews, color: rGrey),
+                      SizedBox(width: 15),
+                      Text("User Reviews",
                           style: TextStyle(fontFamily: 'NotoSans-Medium')),
                     ],
                   ),

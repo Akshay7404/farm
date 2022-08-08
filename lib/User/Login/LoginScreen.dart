@@ -3,6 +3,7 @@
 import 'package:bouncing_widget/bouncing_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:resortbooking/Admin/Home%20Page/NavigationBar.dart';
+import 'package:resortbooking/SuperAdmin/HomeScreen/SuperAdminHome.dart';
 import 'package:resortbooking/User/Common/Color.dart';
 import 'package:resortbooking/User/Common/Constant.dart';
 import 'package:resortbooking/User/Common/Navigators.dart';
@@ -23,7 +24,10 @@ class LoginScreenState extends State<LoginScreen> {
   final email_control = TextEditingController();
   final pass_control = TextEditingController();
   final _form = GlobalKey<FormState>();
-
+  String Admin_email = "admin@gmail.com";
+  String Admin_Pass = "1234567";
+  String owner_email = "owner@gmail.com";
+  String owner_Pass = "1234567";
   bool _passwordVisible = false;
   @override
   void initState() {
@@ -181,11 +185,14 @@ class LoginScreenState extends State<LoginScreen> {
                       if (_form.currentState!.validate() && id == 1) {
                         pushScreen(
                             context, () => BottomNavigationBarMenu(index: 0));
-                      } else if (_form.currentState!.validate() && id == 2) {
+                      } else if (_form.currentState!.validate() &&
+                          id == 2 &&
+                          owner_email == email_control.text &&
+                          owner_Pass == pass_control.text) {
                         pushScreen(context, () => NavigationBarMenu(index: 0));
-                        null;
-                      } else {
-                        null;
+                      } else if (Admin_email == email_control.text ||
+                          Admin_Pass == email_control.text) {
+                        pushScreen(context, () => SuperAdminHome());
                       }
                     },
                     child: Container(
