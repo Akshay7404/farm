@@ -106,13 +106,16 @@ class _farmBookingState extends State<farmBooking> {
             CarouselSlider(
               options: CarouselOptions(
                 aspectRatio: 2,
-                  autoPlay: true),
+                disableCenter: true,
+                autoPlay: true,
+              ),
               items: HotelImg.map((e) {
-                i++;
                 return Container(
-                    child: ClipRRect(
-                        borderRadius: BorderRadius.all(Radius.circular(15)),
-                        child: Image.asset(e, fit: BoxFit.fill)));
+                  margin: EdgeInsets.all(10),
+                  child: ClipRRect(
+                      borderRadius: BorderRadius.all(Radius.circular(15)),
+                      child: Image.asset(e, fit: BoxFit.fill)),
+                );
               }).toList(),
             ),
             Container(
@@ -313,11 +316,11 @@ class _farmBookingState extends State<farmBooking> {
                       } else if (id == 2) {
                         Navigator.of(context).push(MaterialPageRoute(
                             builder: (context) => PayOnFarm()));
-                      } else if(id == 3){
+                      } else if (id == 3) {
                         Navigator.of(context).push(
                             MaterialPageRoute(builder: (context) => Paypal()));
-                      }else{
-                          showToast(text: "Please select payment method");
+                      } else {
+                        showToast(text: "Please select payment method");
                       }
                     },
                     child: Container(

@@ -1,10 +1,13 @@
-// ignore_for_file: prefer_interpolation_to_compose_strings, prefer_const_constructors
+// ignore_for_file: prefer_interpolation_to_compose_strings, prefer_const_constructors, prefer_final_fields, non_constant_identifier_names, prefer_typing_uninitialized_variables
+
+import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:resortbooking/User/Common/Color.dart';
+import 'package:location/location.dart';
 
 class GMap_Address extends StatefulWidget {
   const GMap_Address({Key? key}) : super(key: key);
@@ -14,47 +17,46 @@ class GMap_Address extends StatefulWidget {
 }
 
 class _GMap_AddressState extends State<GMap_Address> {
-  late GoogleMapController mapController;
+  final Completer<GoogleMapController> _controller = Completer();
+
+  static const CameraPosition initialCameraPosition =
+      CameraPosition(target: LatLng(21.1702, 72.8311), zoom: 14);
+
   late CameraPosition cameraPosition;
-  LatLng startLocation = LatLng(21.1702, 72.8311);
+
   String location = "Location Name:";
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          iconTheme: const IconThemeData(color: Colors.black),
-          backgroundColor: Colors.transparent,
-          elevation: 0.0,
-          titleSpacing: 0,
-          centerTitle: true,
-          title: const Text(
-            "Select Address",
-            style:
-                TextStyle(fontFamily: 'NotoSans-Medium', color: Colors.black),
-          ),
+      appBar: AppBar(
+        iconTheme: const IconThemeData(color: Colors.black),
+        backgroundColor: Colors.transparent,
+        elevation: 0.0,
+        titleSpacing: 0,
+        centerTitle: true,
+        title: const Text(
+          "Select Address",
+          style: TextStyle(fontFamily: 'NotoSans-Medium', color: Colors.black),
         ),
-        body: Stack(children: [
+      ),
+      body: Stack(
+        children: [
           GoogleMap(
-            zoomGesturesEnabled: true,
-            initialCameraPosition: CameraPosition(
-              target: startLocation,
-              zoom: 14.0,
-            ),
+            initialCameraPosition: initialCameraPosition,
             mapToolbarEnabled: true,
             myLocationEnabled: true,
+            zoomControlsEnabled: false,
             mapType: MapType.normal,
-            onMapCreated: (controller) {
-              setState(() {
-                mapController = controller;
-              });
+            onMapCreated: (GoogleMapController controller) {
+              _controller.complete(controller);
             },
-            onCameraMove: (cameraPositiona) {
-              cameraPosition = cameraPositiona;
+            onCameraMove: (Positiona) {
+              cameraPosition = Positiona;
             },
             onCameraIdle: () async {
               List<Placemark> placemarks = await placemarkFromCoordinates(
-                  cameraPosition.target.latitude,
-                  cameraPosition.target.longitude);
+                  cameraPosition.target.longitude,
+                  cameraPosition.target.latitude);
               setState(() {
                 location = placemarks.first.street.toString() +
                     ", " +
@@ -72,7 +74,7 @@ class _GMap_AddressState extends State<GMap_Address> {
               });
             },
           ),
-          Center(child: Icon(Icons.location_on)),
+          Center(child: Icon(Icons.location_on, size: 30)),
           Positioned(
               bottom: 100,
               child: Padding(
@@ -91,7 +93,9 @@ class _GMap_AddressState extends State<GMap_Address> {
                         dense: true,
                       )),
                 ),
-              ))
-        ]));
+              )),
+        ],
+      ),
+    );
   }
 }

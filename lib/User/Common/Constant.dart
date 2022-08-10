@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-
 import 'Color.dart';
 
 SizedBox appDevider() {
@@ -178,3 +177,4 @@ void showToast(
       textColor: Colors.black,
       fontSize: 16.0);
 }
+

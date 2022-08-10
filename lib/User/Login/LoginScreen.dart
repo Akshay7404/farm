@@ -1,6 +1,7 @@
-// ignore_for_file: prefer_const_literals_to_create_immutables, prefer_const_constructors
+// ignore_for_file: prefer_const_literals_to_create_immutables, prefer_const_constructors, use_build_context_synchronously
 
 import 'package:bouncing_widget/bouncing_widget.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:resortbooking/Admin/Home%20Page/NavigationBar.dart';
 import 'package:resortbooking/SuperAdmin/HomeScreen/SuperAdminHome.dart';
@@ -12,6 +13,8 @@ import 'package:resortbooking/User/Common/TextField.dart';
 import 'package:resortbooking/User/Forgot%20Password/ForgotPassword.dart';
 import 'package:resortbooking/User/Home%20Page/BottomNavigationBar.dart';
 import 'package:resortbooking/User/Sign%20Up/SignUpScreen.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -29,12 +32,12 @@ class LoginScreenState extends State<LoginScreen> {
   String owner_email = "owner@gmail.com";
   String owner_Pass = "1234567";
   bool _passwordVisible = false;
+
   @override
   void initState() {
     _passwordVisible = false;
   }
 
-  int id = 0;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -126,7 +129,7 @@ class LoginScreenState extends State<LoginScreen> {
                     crossAxisAlignment: CrossAxisAlignment.end,
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      GestureDetector(
+                      InkWell(
                         onTap: () {
                           pushScreen(context, () => ForgotPassword());
                         },
@@ -136,64 +139,18 @@ class LoginScreenState extends State<LoginScreen> {
                     ],
                   ),
                   SizedBox(height: 25),
-                  Row(
-                    children: [
-                      widthSpace(10),
-                      Expanded(
-                        child: Row(
-                          children: [
-                            Radio(
-                                activeColor: rPrimarycolor,
-                                value: 1,
-                                groupValue: id,
-                                onChanged: (index) {
-                                  setState(() {
-                                    id = 1;
-                                  });
-                                }),
-                            Text("User",
-                                style: TextStyle(
-                                    fontSize: 16,
-                                    fontFamily: 'NotoSans-Medium')),
-                          ],
-                        ),
-                      ),
-                      Expanded(
-                        child: Row(
-                          children: [
-                            Radio(
-                                activeColor: rPrimarycolor,
-                                value: 2,
-                                groupValue: id,
-                                onChanged: (index) {
-                                  setState(() {
-                                    id = 2;
-                                  });
-                                }),
-                            Text("Owner",
-                                textAlign: TextAlign.start,
-                                style: TextStyle(
-                                    fontSize: 16,
-                                    fontFamily: 'NotoSans-Medium')),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
                   BouncingWidget(
                     onPressed: () {
-                      if (_form.currentState!.validate() && id == 1) {
-                        pushScreen(
-                            context, () => BottomNavigationBarMenu(index: 0));
-                      } else if (_form.currentState!.validate() &&
-                          id == 2 &&
-                          owner_email == email_control.text &&
-                          owner_Pass == pass_control.text) {
-                        pushScreen(context, () => NavigationBarMenu(index: 0));
-                      } else if (Admin_email == email_control.text ||
-                          Admin_Pass == email_control.text) {
-                        pushScreen(context, () => SuperAdminHome());
-                      }
+                      SignIn(email_control.text, pass_control.text);
+                      // if (_form.currentState!.validate() &&
+                      //     id == 2 &&
+                      //     owner_email == email_control.text &&
+                      //     owner_Pass == pass_control.text) {
+                      //   pushScreen(context, () => NavigationBarMenu(index: 0));
+                      // } else if (Admin_email == email_control.text ||
+                      //     Admin_Pass == email_control.text) {
+                      //   pushScreen(context, () => SuperAdminHome());
+                      // }
                     },
                     child: Container(
                       height: 50,
@@ -236,5 +193,48 @@ class LoginScreenState extends State<LoginScreen> {
         ),
       ),
     );
+  }
+
+  final storage = FlutterSecureStorage();
+  String? errorMessage;
+  final _auth = FirebaseAuth.instance;
+  Future<void> SignIn(String email, String password) async {
+    if (_form.currentState!.validate()) {
+      try {
+        UserCredential credential = await _auth.signInWithEmailAndPassword(
+            email: email, password: password);
+        // print(credential.user?.uid);
+        await storage.write(key: "uid", value: credential.user?.uid);
+
+        Fluttertoast.showToast(msg: "Login Sucessfully");
+        pushScreen(context, () => BottomNavigationBarMenu(index: 0));
+      } on FirebaseAuthException catch (error) {
+        switch (error.code) {
+          case "invalid-email":
+            errorMessage = "Your email address appears to be malformed.";
+
+            break;
+          case "wrong-password":
+            errorMessage = "Your password is wrong.";
+            break;
+          case "user-not-found":
+            errorMessage = "User with this email doesn't exist.";
+            break;
+          case "user-disabled":
+            errorMessage = "User with this email has been disabled.";
+            break;
+          case "too-many-requests":
+            errorMessage = "Too many requests";
+            break;
+          case "operation-not-allowed":
+            errorMessage = "Signing in with Email and Password is not enabled.";
+            break;
+          default:
+            errorMessage = "An undefined Error happened.";
+        }
+        Fluttertoast.showToast(msg: errorMessage!);
+        print(error.code);
+      }
+    }
   }
 }

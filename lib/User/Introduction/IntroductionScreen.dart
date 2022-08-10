@@ -1,5 +1,6 @@
-import 'dart:developer';
+// ignore_for_file: non_constant_identifier_names
 
+import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:intro_slider/intro_slider.dart';
 import 'package:resortbooking/User/Common/Navigators.dart';
@@ -13,7 +14,6 @@ class introductionSlider extends StatefulWidget {
 }
 
 class _introductionSliderState extends State<introductionSlider> {
-
   List<Slide> slides = [];
 
   late Function goToTab;
@@ -24,23 +24,21 @@ class _introductionSliderState extends State<introductionSlider> {
 
     slides.add(
       Slide(
-        title: "Plan Your Trips",
-        styleTitle: const TextStyle(
-          color: Colors.black,
-          fontSize: 20,
-          fontWeight: FontWeight.bold,
-          fontFamily: "NotoSans-Bold",
-        ),
-        description:
-        "Book one of your unique hotel to escap the ordinary",
-        styleDescription: const TextStyle(
-          color: Colors.grey,
-          fontSize: 16,
-          fontFamily: 'NotoSans-Regular',
-        ),
-        pathImage: "assets/image/ic_intro1.png",
-        backgroundColor: Colors.red
-      ),
+          title: "Plan Your Trips",
+          styleTitle: const TextStyle(
+            color: Colors.black,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            fontFamily: "NotoSans-Bold",
+          ),
+          description: "Book one of your unique hotel to escap the ordinary",
+          styleDescription: const TextStyle(
+            color: Colors.grey,
+            fontSize: 16,
+            fontFamily: 'NotoSans-Regular',
+          ),
+          pathImage: "assets/image/ic_intro1.png",
+          backgroundColor: Colors.red),
     );
     slides.add(
       Slide(
@@ -51,7 +49,8 @@ class _introductionSliderState extends State<introductionSlider> {
           fontWeight: FontWeight.bold,
           fontFamily: "NotoSans-Bold",
         ),
-        description: "Find deals for any season from cosy country homes to city flats",
+        description:
+            "Find deals for any season from cosy country homes to city flats",
         styleDescription: const TextStyle(
           color: Colors.grey,
           fontSize: 16,
@@ -70,7 +69,7 @@ class _introductionSliderState extends State<introductionSlider> {
           fontFamily: "NotoSans-Bold",
         ),
         description:
-        "Find deals for any sesson from cosy country homes to city flats",
+            "Find deals for any sesson from cosy country homes to city flats",
         styleDescription: const TextStyle(
           color: Colors.grey,
           fontSize: 16,
@@ -107,8 +106,10 @@ class _introductionSliderState extends State<introductionSlider> {
 
   Widget renderSkipBtn() {
     return const Text(
-     "Skip",
-      style: TextStyle( color: Color(0xFF26A69A),),
+      "Skip",
+      style: TextStyle(
+        color: Color(0xFF26A69A),
+      ),
     );
   }
 
@@ -123,11 +124,12 @@ class _introductionSliderState extends State<introductionSlider> {
   List<Widget> renderListCustomTabs() {
     return List.generate(
       slides.length,
-          (index) => SizedBox(
+      (index) => SizedBox(
         width: double.infinity,
         height: double.infinity,
         child: Container(
-          margin: EdgeInsets.only(bottom: 60.0,top: MediaQuery.of(context).size.height * 0.12),
+          margin: EdgeInsets.only(
+              bottom: 60.0, top: MediaQuery.of(context).size.height * 0.12),
           child: ListView(
             children: <Widget>[
               GestureDetector(
@@ -168,37 +170,39 @@ class _introductionSliderState extends State<introductionSlider> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: IntroSlider(
-      autoScroll: true,
-      colorDot: const Color(0xFF26A69A),
-      sizeDot: 10.0,
-      typeDotAnimation: DotSliderAnimation.SIZE_TRANSITION,
-      autoScrollInterval: Duration(seconds: 3),
-      scrollable: true,
-      loopAutoScroll: true,
+        autoScroll: true,
+        colorDot: const Color(0xFF26A69A),
+        sizeDot: 10.0,
+        typeDotAnimation: DotSliderAnimation.SIZE_TRANSITION,
+        autoScrollInterval: Duration(seconds: 3),
+        scrollable: true,
+        loopAutoScroll: true,
 
-      // Skip button
-      renderSkipBtn: renderSkipBtn(),
-      skipButtonStyle: myButtonStyle(),
+        // Skip button
+        renderSkipBtn: renderSkipBtn(),
+        skipButtonStyle: myButtonStyle(),
 
-      // Next button
-      renderNextBtn: renderNextBtn(),
-      nextButtonStyle: myButtonStyle(),
+        // Next button
+        renderNextBtn: renderNextBtn(),
+        nextButtonStyle: myButtonStyle(),
 
-      // Done button
-      renderDoneBtn: renderDoneBtn(),
-      onDonePress: onDonePress,
-      doneButtonStyle: myButtonStyle(),
-      // Tabs
-      listCustomTabs: renderListCustomTabs(),
-      backgroundColorAllSlides: Colors.white,
-      refFuncGoToTab: (refFunc) {
-        goToTab = refFunc;
-      },
-      scrollPhysics: const BouncingScrollPhysics(),
-      hideStatusBar: false,
+        // Done button
+        renderDoneBtn: renderDoneBtn(),
+        onDonePress: onDonePress,
+        doneButtonStyle: myButtonStyle(),
+        // Tabs
+        listCustomTabs: renderListCustomTabs(),
+        backgroundColorAllSlides: Colors.white,
+        refFuncGoToTab: (refFunc) {
+          goToTab = refFunc;
+        },
+        scrollPhysics: const BouncingScrollPhysics(),
+        hideStatusBar: false,
 
-      onTabChangeCompleted: onTabChangeCompleted,
-        ),
+        onTabChangeCompleted: onTabChangeCompleted,
+      ),
     );
   }
+
+  
 }

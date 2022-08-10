@@ -1,9 +1,13 @@
-// ignore_for_file: prefer_const_constructors
+// ignore_for_file: prefer_const_constructors, use_build_context_synchronously
 
 import 'package:flutter/material.dart';
 import 'package:resortbooking/User/Common/Color.dart';
 import 'package:resortbooking/User/Common/Constant.dart';
+import 'package:resortbooking/User/Common/Navigators.dart';
 import 'package:resortbooking/User/Common/Style.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:resortbooking/User/Login/LoginScreen.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 Widget logout() {
   return StatefulBuilder(
@@ -45,7 +49,7 @@ Widget logout() {
                         Container(width: 1, height: 28, color: rGrey),
                         TextButton(
                             onPressed: () {
-                              Navigator.pop(context);
+                              Logout_user(context);
                             },
                             child: Text("Yes",
                                 style: TextStyle(color: Colors.green)))
@@ -72,4 +76,11 @@ Widget logout() {
       ),
     ),
   );
+}
+
+final storage = FlutterSecureStorage();
+Future Logout_user(BuildContext context) async {
+  await FirebaseAuth.instance.signOut();
+  await storage.delete(key: "uid");
+  pushScreen(context, () => LoginScreen());
 }

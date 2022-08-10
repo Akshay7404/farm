@@ -98,25 +98,23 @@ class _FarmOwnerDetailsState extends State<FarmOwnerDetails> {
               ],
               rows: [
                 DataRow(cells: [
-                  DataCell(Flexible(child: Text('Rio Colina'))),
-                  DataCell(Flexible(child: Text('Digas,Surat'))),
-                  DataCell(Flexible(child: Text('500 Vaar'))),
-                  DataCell(Flexible(
-                      child: InkWell(
+                  DataCell(Text('Rio Colina')),
+                  DataCell(Text('Digas,Surat')),
+                  DataCell(Text('500 Vaar')),
+                  DataCell(InkWell(
                     onTap: () => pushScreen(context, () => FarmPhotos()),
                     child:
                         Text('Image', style: TextStyle(color: rPrimarycolor)),
-                  ))),
+                  )),
                 ]),
                 DataRow(cells: [
-                  DataCell(Flexible(child: Text('Palm Villa'))),
-                  DataCell(Flexible(child: Text('Dhoran Pardi,Surat'))),
-                  DataCell(Flexible(child: Text('500 Vaar'))),
-                  DataCell(Flexible(
-                      child: InkWell(
-                          onTap: () => pushScreen(context, () => FarmPhotos()),
-                          child: Text('Image',
-                              style: TextStyle(color: rPrimarycolor))))),
+                  DataCell(Text('Palm Villa')),
+                  DataCell(Text('Dhoran Pardi,Surat')),
+                  DataCell(Text('500 Vaar')),
+                  DataCell(InkWell(
+                      onTap: () => pushScreen(context, () => FarmPhotos()),
+                      child: Text('Image',
+                          style: TextStyle(color: rPrimarycolor)))),
                 ]),
               ],
             ),

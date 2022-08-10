@@ -6,6 +6,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:resortbooking/User/Common/Constant.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class GMap extends StatefulWidget {
   const GMap({Key? key}) : super(key: key);
@@ -25,7 +26,9 @@ class _GMapState extends State<GMap> {
 
   @override
   void initState() {
-    showToast(text: "tap on the hotel marker");
+    Fluttertoast.showToast(
+        msg: "tap on the red marker and select direction",
+        toastLength: Toast.LENGTH_LONG);
     super.initState();
   }
 
@@ -53,6 +56,7 @@ class _GMapState extends State<GMap> {
         mapToolbarEnabled: true,
         myLocationEnabled: true,
         zoomControlsEnabled: false,
+        myLocationButtonEnabled: true,
         mapType: MapType.normal,
         onMapCreated: (GoogleMapController controller) {
           googleMapController = controller;

@@ -16,6 +16,7 @@ class reviews extends StatefulWidget {
 
 class _reviewsState extends State<reviews> {
   @override
+  bool isvisiable = true;
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(

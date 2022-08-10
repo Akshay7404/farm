@@ -274,10 +274,9 @@ Widget FarmDetails() {
             SizedBox(height: 20),
             CarouselSlider(
               options: CarouselOptions(
-                height: MediaQuery.of(context).size.height * 0.2,
+                aspectRatio: 2,
                 disableCenter: true,
                 autoPlay: true,
-                enableInfiniteScroll: false,
               ),
               items: HotelImg.map((e) {
                 return Container(
