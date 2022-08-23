@@ -1,101 +1,143 @@
-// ignore_for_file: prefer_interpolation_to_compose_strings, prefer_const_constructors, prefer_final_fields, non_constant_identifier_names, prefer_typing_uninitialized_variables
+// ignore_for_file: prefer_interpolation_to_compose_strings
 
 import 'dart:async';
-
+import 'dart:developer';
+import 'package:location/location.dart';
 import 'package:flutter/material.dart';
-import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:resortbooking/User/Common/Color.dart';
-import 'package:location/location.dart';
+import 'package:geocoding/geocoding.dart';
 
-class GMap_Address extends StatefulWidget {
-  const GMap_Address({Key? key}) : super(key: key);
+class MapAddress extends StatefulWidget {
+  const MapAddress({Key? key}) : super(key: key);
 
   @override
-  State<GMap_Address> createState() => _GMap_AddressState();
+  _MapAddressState createState() => _MapAddressState();
 }
 
-class _GMap_AddressState extends State<GMap_Address> {
-  final Completer<GoogleMapController> _controller = Completer();
+class _MapAddressState extends State<MapAddress> {
+  late GoogleMapController googleMapController;
 
   static const CameraPosition initialCameraPosition =
       CameraPosition(target: LatLng(21.1702, 72.8311), zoom: 14);
-
   late CameraPosition cameraPosition;
-
+  Set<Marker> markers = {};
   String location = "Location Name:";
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        iconTheme: const IconThemeData(color: Colors.black),
-        backgroundColor: Colors.transparent,
-        elevation: 0.0,
-        titleSpacing: 0,
+        title: const Text("User current location"),
         centerTitle: true,
-        title: const Text(
-          "Select Address",
-          style: TextStyle(fontFamily: 'NotoSans-Medium', color: Colors.black),
-        ),
       ),
       body: Stack(
         children: [
           GoogleMap(
             initialCameraPosition: initialCameraPosition,
-            mapToolbarEnabled: true,
-            myLocationEnabled: true,
+            markers: markers,
             zoomControlsEnabled: false,
             mapType: MapType.normal,
             onMapCreated: (GoogleMapController controller) {
-              _controller.complete(controller);
+              googleMapController = controller;
             },
-            onCameraMove: (Positiona) {
-              cameraPosition = Positiona;
+            onCameraMove: (Position) {
+              cameraPosition = Position;
             },
             onCameraIdle: () async {
-              List<Placemark> placemarks = await placemarkFromCoordinates(
-                  cameraPosition.target.longitude,
-                  cameraPosition.target.latitude);
+              List<Placemark> placemark = await placemarkFromCoordinates(
+                  cameraPosition.target.latitude,
+                  cameraPosition.target.longitude);
               setState(() {
-                location = placemarks.first.street.toString() +
+                location = placemark.first.street.toString() +
                     ", " +
-                    placemarks.first.subLocality.toString() +
-                    " " +
-                    placemarks.first.thoroughfare.toString() +
+                    placemark.first.subLocality.toString() +
                     ", " +
-                    placemarks.first.name.toString() +
+                    placemark.first.thoroughfare.toString() +
                     ", " +
-                    placemarks.first.administrativeArea.toString() +
+                    placemark.first.name.toString() +
                     ", " +
-                    placemarks.first.postalCode.toString() +
+                    placemark.first.administrativeArea.toString() +
                     ", " +
-                    placemarks.first.country.toString();
+                    placemark.first.postalCode.toString() +
+                    ", " +
+                    placemark.first.country.toString();
               });
             },
           ),
           Center(child: Icon(Icons.location_on, size: 30)),
           Positioned(
-              bottom: 100,
-              child: Padding(
-                padding: EdgeInsets.all(15),
-                child: Card(
-                  child: Container(
-                      width: MediaQuery.of(context).size.width - 40,
-                      child: ListTile(
-                        leading: TextButton(
-                            child: Text("ok",
-                                style: TextStyle(color: rPrimarycolor)),
-                            onPressed: () {
-                              Navigator.pop(context, location);
-                            }),
-                        title: Text(location, style: TextStyle(fontSize: 18)),
-                        dense: true,
-                      )),
+            bottom: 100,
+            child: Padding(
+              padding: EdgeInsets.all(15),
+              child: Card(
+                child: Container(
+                  width: MediaQuery.of(context).size.width - 40,
+                  child: ListTile(
+                    leading: TextButton(
+                      child: Text("ok", style: TextStyle(color: rPrimarycolor)),
+                      onPressed: () {
+                        Navigator.pop(context, location);
+                      },
+                    ),
+                    title: Text(location, style: TextStyle(fontSize: 18)),
+                    dense: true,
+                  ),
                 ),
-              )),
+              ),
+            ),
+          ),
         ],
       ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () async {
+          Position position = await _determinePosition();
+
+          googleMapController.animateCamera(CameraUpdate.newCameraPosition(
+              CameraPosition(
+                  target: LatLng(position.latitude, position.longitude),
+                  zoom: 14)));
+
+          markers.clear();
+
+          markers.add(Marker(
+              markerId: const MarkerId('currentLocation'),
+              position: LatLng(position.latitude, position.longitude)));
+
+          setState(() {});
+        },
+        label: const Text("Current Location"),
+        icon: const Icon(Icons.location_history),
+      ),
     );
+  }
+
+  Future<Position> _determinePosition() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+
+    if (!serviceEnabled) {
+      return Future.error('Location services are disabled');
+    }
+
+    permission = await Geolocator.checkPermission();
+
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+
+      if (permission == LocationPermission.denied) {
+        return Future.error("Location permission denied");
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      return Future.error('Location permissions are permanently denied');
+    }
+
+    Position position = await Geolocator.getCurrentPosition();
+
+    return position;
   }
 }

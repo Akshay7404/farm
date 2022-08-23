@@ -9,7 +9,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:resortbooking/User/Login/LoginScreen.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-Widget logout() {
+Widget Adminlogout() {
   return StatefulBuilder(
     builder: (context, setState) => InkWell(
       onTap: () => showDialog(
@@ -82,7 +82,7 @@ final storage = FlutterSecureStorage();
 Future Logout_user(BuildContext context) async {
   await FirebaseAuth.instance.signOut();
   await storage.delete(key: "uid");
-   Navigator.pushAndRemoveUntil(
+  Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(
         builder: (context) => LoginScreen(),

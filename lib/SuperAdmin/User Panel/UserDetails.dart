@@ -2,6 +2,7 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:resortbooking/Model/user_model.dart';
 import 'package:resortbooking/SuperAdmin/User%20Panel/DeleteUser.dart';
 import 'package:resortbooking/User/Common/Color.dart';
 import 'package:resortbooking/User/Common/Constant.dart';
@@ -10,14 +11,23 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:resortbooking/User/Common/TextField.dart';
 import 'package:intl/intl.dart';
 
+
 class UserDetails extends StatefulWidget {
-  const UserDetails({Key? key}) : super(key: key);
+  final Usermodel usermodel;
+  const UserDetails({Key? key, required this.usermodel}) : super(key: key);
 
   @override
   State<UserDetails> createState() => _UserDetailsState();
 }
 
 class _UserDetailsState extends State<UserDetails> {
+  late Usermodel user;
+  @override
+  void initState() {
+    user = widget.usermodel;
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -45,7 +55,7 @@ class _UserDetailsState extends State<UserDetails> {
                   width: 140,
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(10),
-                    child: Image.asset('assets/image/person.jpg',
+                    child: Image.network("${user.ProfilePic.toString()}",
                         fit: BoxFit.fill),
                   ),
                 ),
@@ -56,30 +66,30 @@ class _UserDetailsState extends State<UserDetails> {
                     children: [
                       Text("Name",
                           style: TextStyle(fontFamily: 'NotoSans-Medium')),
-                      Text("Alexia jane", style: normalStyle),
+                      Text("${user.UserFName} ${user.UserLName}",
+                          style: normalStyle),
                       heightSpace(10),
                       Text("E-mail",
                           style: TextStyle(fontFamily: 'NotoSans-Medium')),
-                      Text("Alexiajane@gmail.com", style: normalStyle),
+                      Text("${user.UserEmail}", style: normalStyle),
                       heightSpace(10),
                       Text("Phome Number",
                           style: TextStyle(fontFamily: 'NotoSans-Medium')),
-                      Text("+91 1234567890", style: normalStyle),
+                      Text("${user.PhoneNumber}", style: normalStyle),
                     ],
                   ),
                 ),
               ],
             ),
             heightSpace(10),
-            Text("City / Pincode",
-                style: TextStyle(fontFamily: 'NotoSans-Medium')),
-            Text("Surat - 395009", style: normalStyle),
+            Text("City", style: TextStyle(fontFamily: 'NotoSans-Medium')),
+            Text("${user.City}", style: normalStyle),
             heightSpace(10),
             Text("State", style: TextStyle(fontFamily: 'NotoSans-Medium')),
-            Text("Gujrat", style: normalStyle),
+            Text("${user.State}", style: normalStyle),
             heightSpace(10),
             Text("Country", style: TextStyle(fontFamily: 'NotoSans-Medium')),
-            Text("India", style: normalStyle),
+            Text("${user.Country}", style: normalStyle),
             heightSpace(15),
             Text("Booking History",
                 style: TextStyle(fontFamily: 'NotoSans-Bold', fontSize: 16)),
@@ -149,7 +159,7 @@ class _UserDetailsState extends State<UserDetails> {
                             style: TextStyle(color: Colors.black))
                       ],
                     )),
-                DeleteUser()
+                DeleteUser(user)
               ],
             ),
             heightSpace(20),
@@ -170,4 +180,5 @@ class _UserDetailsState extends State<UserDetails> {
 
   DateTime? SelectDate;
   final BlockUser = TextEditingController();
+
 }

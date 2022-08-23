@@ -1,7 +1,10 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, prefer_interpolation_to_compose_strings
+// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, prefer_interpolation_to_compose_strings, unnecessary_null_comparison
 
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:resortbooking/Model/Property_model.dart';
+import 'package:resortbooking/Model/user_model.dart';
 import 'package:resortbooking/User/Common/Style.dart';
 import 'package:resortbooking/User/Common/Color.dart';
 import 'package:resortbooking/User/Common/Constant.dart';
@@ -12,15 +15,32 @@ import 'package:bouncing_widget/bouncing_widget.dart';
 import 'package:intl/intl.dart';
 import '../Payments/CreditDebit.dart';
 import '../Payments/PayOnFarm.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class farmBooking extends StatefulWidget {
-  const farmBooking({Key? key}) : super(key: key);
+  final PropertyModel property;
+
+  const farmBooking({Key? key, required this.property}) : super(key: key);
 
   @override
   State<farmBooking> createState() => _farmBookingState();
 }
 
 class _farmBookingState extends State<farmBooking> {
+  PropertyModel propertyModel = PropertyModel();
+
+  @override
+  void initState() {
+    propertyModel = widget.property;
+    getCurrentUser();
+    
+    super.initState();
+  }
+
+  String? prifix;
+  List? contacts;
   final TextEditingController SelectDatecontroller = TextEditingController();
 
   final List HotelImg = [
@@ -37,6 +57,7 @@ class _farmBookingState extends State<farmBooking> {
   Widget select_date() {
     return SfDateRangePicker(
       showActionButtons: true,
+      enablePastDates: false,
       allowViewNavigation: true,
       navigationMode: DateRangePickerNavigationMode.scroll,
       navigationDirection: DateRangePickerNavigationDirection.vertical,
@@ -58,10 +79,14 @@ class _farmBookingState extends State<farmBooking> {
         Navigator.pop(context);
       },
       onSubmit: (Object) async {
-        setState(() {
-          SelectDatecontroller.text = range.toString();
-          Navigator.pop(context);
-        });
+        if (range == null || SelectDatecontroller.text == null) {
+          Fluttertoast.showToast(msg: "Please Select Date");
+        } else {
+          setState(() {
+            SelectDatecontroller.text = range.toString();
+            Navigator.pop(context);
+          });
+        }
       },
     );
   }
@@ -83,6 +108,34 @@ class _farmBookingState extends State<farmBooking> {
   }
 
   int id = 0;
+  User? user = FirebaseAuth.instance.currentUser;
+  bool isLoading = false;
+  late Map<String, dynamic> userMap2;
+
+  void getCurrentUser() async {
+    FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+    final User? user = FirebaseAuth.instance.currentUser;
+    final uuid = user!.uid;
+
+    setState(() {
+      isLoading = true;
+    });
+
+    await _firestore
+        .collection('users')
+        .where("UserId", isEqualTo: uuid)
+        .get()
+        .then((value) {
+      setState(() {
+        userMap2 = value.docs[0].data();
+        isLoading = false;
+      });
+      print(userMap2);
+    });
+  }
+
+  late String dateTime;
 
   @override
   Widget build(BuildContext context) {
@@ -124,25 +177,27 @@ class _farmBookingState extends State<farmBooking> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "Grand royal Hotel",
+                    "${propertyModel.PropertyName}",
                     style: TextStyle(fontSize: 20, fontFamily: 'NotoSans-Bold'),
                   ),
                   Row(
                     children: [
-                      Text("Wembley, London",
-                          style: TextStyle(
-                            fontFamily: 'NotoSans-Medium',
-                          )),
                       Icon(
                         Icons.location_on,
                         color: rPrimarycolor,
                         size: 16,
                       ),
-                      Text("2.0 km to city",
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(fontFamily: 'NotoSans-Medium')),
+                      Text("${propertyModel.PropertyCity}",
+                          style: TextStyle(
+                            fontFamily: 'NotoSans-Medium',
+                          )),
+                      widthSpace(3),
+                      Text("${propertyModel.PropertyCity}",
+                          style: TextStyle(
+                            fontFamily: 'NotoSans-Medium',
+                          )),
                       Expanded(
-                        child: Text("\$180",
+                        child: Text("\₹${propertyModel.RentWeekDays}",
                             textAlign: TextAlign.end,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
@@ -161,7 +216,7 @@ class _farmBookingState extends State<farmBooking> {
                         boxShadow: [
                           BoxShadow(
                               color: Colors.black12,
-                              blurRadius: 2,
+                              blurRadius: 15,
                               offset: Offset(1.5, 1)),
                         ],
                       ),
@@ -170,7 +225,7 @@ class _farmBookingState extends State<farmBooking> {
                         hintText: "Select Date",
                         isReadOnly: true,
                         suffixIcon: IconButton(
-                            onPressed: () {},
+                            onPressed: null,
                             icon: Icon(
                               Icons.keyboard_arrow_right,
                               color: rGrey,
@@ -178,7 +233,64 @@ class _farmBookingState extends State<farmBooking> {
                         click: () {
                           showModalBottomSheet(
                               context: context,
-                              builder: (BuildContext context) => select_date());
+                              builder: (BuildContext context) =>
+                                  SfDateRangePicker(
+                                    showActionButtons: true,
+                                    enablePastDates: false,
+                                    allowViewNavigation: true,
+                                    navigationMode:
+                                        DateRangePickerNavigationMode.scroll,
+                                    navigationDirection:
+                                        DateRangePickerNavigationDirection
+                                            .vertical,
+                                    selectionColor: rPrimarycolor,
+                                    rangeSelectionColor: Colors.teal.shade100,
+                                    endRangeSelectionColor: rPrimarycolor,
+                                    startRangeSelectionColor: rPrimarycolor,
+                                    onSelectionChanged: onSelectionChanged,
+                                    monthViewSettings:
+                                        DateRangePickerMonthViewSettings(
+                                            dayFormat: 'EEE',
+                                            blackoutDates: [
+                                          // DateTime.parse(dateTime
+                                          //     .split(' ')
+                                          //     .first
+                                          //     .toString()
+                                          //     .trim()),
+                                          // DateTime.parse(dateTime
+                                          //     .split(' ')
+                                          //     .last
+                                          //     .toString()
+                                          //     .trim())
+                                        ]),
+                                    selectionMode:
+                                        DateRangePickerSelectionMode.range,
+                                    initialSelectedRange: PickerDateRange(
+                                      DateTime.now()
+                                          .subtract(const Duration(days: 0)),
+                                      DateTime.now()
+                                          .add(const Duration(days: 0)),
+                                    ),
+                                    cancelText: 'CANCEL',
+                                    confirmText: 'OK',
+                                    onCancel: () {
+                                      SelectDatecontroller.text = "";
+                                      Navigator.pop(context);
+                                    },
+                                    onSubmit: (Object) async {
+                                      if (range == null ||
+                                          SelectDatecontroller.text == null) {
+                                        Fluttertoast.showToast(
+                                            msg: "Please Select Date");
+                                      } else {
+                                        setState(() {
+                                          SelectDatecontroller.text =
+                                              range.toString();
+                                          Navigator.pop(context);
+                                        });
+                                      }
+                                    },
+                                  ));
                         },
                       )),
                   heightSpace(30),
@@ -191,7 +303,7 @@ class _farmBookingState extends State<farmBooking> {
                     children: [
                       Text("Subtotal",
                           style: TextStyle(fontFamily: 'NotoSans-Medium')),
-                      Text("\$180",
+                      Text("\₹${propertyModel.RentWeekDays}",
                           style: TextStyle(fontFamily: 'NotoSans-Bold')),
                     ],
                   ),
@@ -308,7 +420,7 @@ class _farmBookingState extends State<farmBooking> {
                   ),
                   heightSpace(30),
                   BouncingWidget(
-                    onPressed: () {
+                    onPressed: () async {
                       if (id == 1) {
                         Navigator.of(context).push(MaterialPageRoute(
                           builder: (context) => CreditDebit_Card(),
@@ -322,6 +434,15 @@ class _farmBookingState extends State<farmBooking> {
                       } else {
                         showToast(text: "Please select payment method");
                       }
+
+                      FirebaseFirestore.instance
+                          .collection('users')
+                          .doc("${user!.uid}")
+                          .update({
+                        'selectdate': SelectDatecontroller.text,
+                      });
+                      dateTime = userMap2['selectdate'];
+                      print(dateTime);
                     },
                     child: Container(
                       height: 50,
@@ -338,7 +459,7 @@ class _farmBookingState extends State<farmBooking> {
                 ],
               ),
             ),
-            heightSpace(100)
+            heightSpace(100),
           ],
         ),
       ),

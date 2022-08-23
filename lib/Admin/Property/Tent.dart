@@ -20,7 +20,7 @@ Widget Tent() {
                 color: Colors.black12, blurRadius: 20, offset: Offset(5, 5)),
           ]),
           child: appTextField(
-            textEditingController: Slipingbeds,
+            textEditingController: Tent_Slipingbeds,
             hintText: "Enter Number Of Slipingbed",
             keyboardType: TextInputType.phone,
             validation: (value) {
@@ -39,7 +39,7 @@ Widget Tent() {
                 color: Colors.black12, blurRadius: 20, offset: Offset(5, 5)),
           ]),
           child: appTextField(
-            textEditingController: guestCapacity,
+            textEditingController: Tent_guestCapacity,
             hintText: "Enter Number Of Guest Allowed",
             keyboardType: TextInputType.phone,
             validation: (value) {
@@ -61,7 +61,7 @@ Widget Tent() {
                 color: Colors.black12, blurRadius: 20, offset: Offset(5, 5)),
           ]),
           child: appTextField(
-            textEditingController: RentWeekdays,
+            textEditingController: Tent_RentWeekdays,
             hintText: "24 Hours Rent",
             keyboardType: TextInputType.phone,
             validation: (value) {
@@ -80,7 +80,7 @@ Widget Tent() {
                 color: Colors.black12, blurRadius: 20, offset: Offset(5, 5)),
           ]),
           child: appTextField(
-            textEditingController: RentWeekends,
+            textEditingController: Tent_RentWeekends,
             hintText: "24 Hours Rent",
             keyboardType: TextInputType.phone,
             validation: (value) {
@@ -108,7 +108,18 @@ Widget Tent() {
             "Fire Safety",
             "First Aid",
           ],
-          values: List.generate(10, (index) => index),
+          values: [
+            "Kichen",
+            "Kichen Accessories",
+            "Bathroom",
+            "Gas Cylinder",
+            "Table",
+            "Chair",
+            "Free Parking",
+            "Generator",
+            "Fire Safety",
+            "First Aid",
+          ],
           groupStyle: GroupStyle(
             activeColor: rPrimarycolor,
             groupTitleStyle: TextStyle(fontFamily: 'NotoSans-Medium'),
@@ -117,7 +128,9 @@ Widget Tent() {
           checkFirstElement: false,
           helperGroupTitle: true,
           onItemSelected: (data) {
-            print(data);
+            setState(() {
+              Tent_Facilities = data;
+            });
           },
           isExpandableTitle: true,
         ),
@@ -125,7 +138,7 @@ Widget Tent() {
         SimpleGroupedCheckbox(
             controller: multipleCheckController,
             itemsTitle: ["Wi-Fi", "Barbecue Area", "Garden", "Mosquito net"],
-            values: List.generate(4, (index) => index),
+            values: ["Wi-Fi", "Barbecue Area", "Garden", "Mosquito net"],
             groupStyle: GroupStyle(
               activeColor: rPrimarycolor,
               groupTitleStyle: TextStyle(fontFamily: 'NotoSans-Medium'),
@@ -134,7 +147,9 @@ Widget Tent() {
             checkFirstElement: false,
             helperGroupTitle: true,
             onItemSelected: (data) {
-              print(data);
+              setState(() {
+                Tent_Amenities = data;
+              });
             },
             isExpandableTitle: true),
         heightSpace(20),
@@ -157,6 +172,11 @@ Widget Tent() {
             'Alcohol Allowed',
             'Pets Allowed'
           ],
+          onItemSelected: (selected) {
+            setState(() {
+              Tent_Terms_and_Ruls = selected;
+            });
+          },
           chipGroupStyle: ChipGroupStyle.minimize(
             backgroundColorItem: Colors.grey.shade400,
             selectedColorItem: rPrimarycolor,
@@ -174,7 +194,7 @@ Widget Tent() {
                   color: Colors.black12, blurRadius: 20, offset: Offset(5, 5)),
             ]),
             child: appTextField(
-              textEditingController: AdditionalRule,
+              textEditingController: Tent_AdditionalRule,
               hintText: "Enter Your Rules & Regulation",
               maxlines: 4,
               validation: (value) {
@@ -188,11 +208,14 @@ Widget Tent() {
   );
 }
 
-final Slipingbeds = TextEditingController();
-final guestCapacity = TextEditingController();
-final RentWeekdays = TextEditingController();
-final RentWeekends = TextEditingController();
-final AdditionalRule = TextEditingController();
+final Tent_Slipingbeds = TextEditingController();
+final Tent_guestCapacity = TextEditingController();
+final Tent_RentWeekdays = TextEditingController();
+final Tent_RentWeekends = TextEditingController();
+final Tent_AdditionalRule = TextEditingController();
+List<String> Tent_Facilities = [];
+List<String> Tent_Amenities = [];
+List<String> Tent_Terms_and_Ruls = [];
 GroupController controller = GroupController();
 GroupController multipleCheckController = GroupController(
   isMultipleSelection: true,

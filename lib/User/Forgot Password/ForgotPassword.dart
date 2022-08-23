@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:resortbooking/User/Common/Color.dart';
 import 'package:resortbooking/User/Common/Style.dart';
 import 'package:resortbooking/User/Common/TextField.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class ForgotPassword extends StatefulWidget {
   const ForgotPassword({Key? key}) : super(key: key);
@@ -43,7 +45,10 @@ class ForgotPasswordState extends State<ForgotPassword> {
                 children: [
                   Text("Forgot Your Password?", style: bigTitleStyle),
                   SizedBox(height: 20),
-                  Text("Enter your email to receive an email to reset your Password", style: normalStyle,),
+                  Text(
+                    "Enter your email to receive an email to reset your Password",
+                    style: normalStyle,
+                  ),
                   SizedBox(height: 20),
                   Container(
                       padding: EdgeInsets.only(left: 18),
@@ -79,6 +84,7 @@ class ForgotPasswordState extends State<ForgotPassword> {
                     onPressed: () {
                       if (_form.currentState!.validate()) {
                         email_check();
+                        ForgotPassword();
                       } else {
                         null;
                       }
@@ -91,8 +97,7 @@ class ForgotPasswordState extends State<ForgotPassword> {
                         color: rPrimarycolor,
                       ),
                       child: Center(
-                        child: Text("Send",
-                            style: buttonStyle),
+                        child: Text("Send", style: buttonStyle),
                       ),
                     ),
                   ),
@@ -101,5 +106,15 @@ class ForgotPasswordState extends State<ForgotPassword> {
         ),
       ),
     );
+  }
+
+  Future ForgotPassword() async {
+    try {
+      await FirebaseAuth.instance
+          .sendPasswordResetEmail(email: email_control.text);
+      Fluttertoast.showToast(msg: 'Reset password link has sent your mail');
+    } on FirebaseAuthException catch (e) {
+      Fluttertoast.showToast(msg: e.toString());
+    }
   }
 }

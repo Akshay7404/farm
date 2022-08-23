@@ -1,6 +1,10 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
+// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, depend_on_referenced_packages, unused_import
+
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:resortbooking/Model/Property_model.dart';
+import 'package:resortbooking/Model/user_model.dart';
 import 'package:resortbooking/User/Farm%20Detail/details_farm.dart';
 import 'package:waterfall_flow/waterfall_flow.dart';
 import 'package:resortbooking/User/Common/Constant.dart';
@@ -8,6 +12,8 @@ import 'package:resortbooking/User/Common/TextField.dart';
 import 'package:resortbooking/User/Home%20Page/search_farm.dart';
 import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({Key? key}) : super(key: key);
@@ -34,110 +40,112 @@ class _SearchScreenState extends State<SearchScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        //backgroundColor: Colors.white,
-        body: SingleChildScrollView(
-      child: Container(
-        padding: EdgeInsets.only(left: 20, right: 20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Container(
-              margin: EdgeInsets.only(
-                  top: MediaQuery.of(context).size.height * 0.05),
-              decoration: BoxDecoration(
-                boxShadow: [
-                  BoxShadow(
-                      color: Colors.black12,
-                      blurRadius: 1,
-                      offset: Offset(1, 1)),
-                ],
+      //backgroundColor: Colors.white,
+      body: SingleChildScrollView(
+        child: Container(
+          padding: EdgeInsets.only(left: 20, right: 20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Container(
+                margin: EdgeInsets.only(
+                    top: MediaQuery.of(context).size.height * 0.05),
+                decoration: BoxDecoration(
+                  boxShadow: [
+                    BoxShadow(
+                        color: Colors.black12,
+                        blurRadius: 1,
+                        offset: Offset(1, 1)),
+                  ],
+                ),
+                child: searchTextField(
+                  isReadOnly: true,
+                  textEditingController: SearchController,
+                  hintText: "Search...",
+                  click: () {
+                    pushNewScreen(
+                      context,
+                      screen: SearchFilter(),
+                      withNavBar: false, // OPTIONAL VALUE. True by default.
+                      pageTransitionAnimation:
+                          PageTransitionAnimation.cupertino,
+                    );
+                  },
+                ),
               ),
-              child: searchTextField(
-                isReadOnly: true,
-                textEditingController: SearchController,
-                hintText: "Search...",
-                click: () {
-                  pushNewScreen(
-                    context,
-                    screen: SearchFilter(),
-                    withNavBar: false, // OPTIONAL VALUE. True by default.
-                    pageTransitionAnimation: PageTransitionAnimation.cupertino,
-                  );
-                },
+              SizedBox(height: 10),
+              Text(
+                "Popular Destination",
+                style:
+                    TextStyle(fontSize: 18, fontFamily: 'NotoSans-ExtraBold'),
               ),
-            ),
-            SizedBox(height: 10),
-            Text(
-              "Popular Destination",
-              style: TextStyle(fontSize: 18, fontFamily: 'NotoSans-ExtraBold'),
-            ),
-            SizedBox(height: 10),
-            CarouselSlider(
-              options: CarouselOptions(
-                  aspectRatio: 2,
-                  enlargeCenterPage: true,
-                  enableInfiniteScroll: true,
-                  autoPlay: true),
-              items: CountryImg.map((e) {
-                i++;
-                return Container(
-                    child: ClipRRect(
-                        borderRadius: BorderRadius.all(Radius.circular(15)),
-                        child: Image.asset(e, fit: BoxFit.fill)));
-              }).toList(),
-            ),
-            SizedBox(
-              height: 20,
-            ),
-            Text(
-              "Best Deals",
-              style: TextStyle(fontSize: 18, fontFamily: 'NotoSans-ExtraBold'),
-            ),
-            Container(
-              child: WaterfallFlow.builder(
-                physics: BouncingScrollPhysics(),
-                shrinkWrap: true,
-                itemCount: 10,
-                padding: EdgeInsets.all(0),
-                gridDelegate:
-                    SliverWaterfallFlowDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 1),
-                itemBuilder: (context, index) {
-                  return Column(
-                    children: [
-                      InkWell(
+              SizedBox(height: 10),
+              CarouselSlider(
+                options: CarouselOptions(
+                    aspectRatio: 2,
+                    enlargeCenterPage: true,
+                    enableInfiniteScroll: true,
+                    autoPlay: true),
+                items: CountryImg.map((e) {
+                  i++;
+                  return Container(
+                      child: ClipRRect(
+                          borderRadius: BorderRadius.all(Radius.circular(15)),
+                          child: Image.asset(e, fit: BoxFit.fill)));
+                }).toList(),
+              ),
+              SizedBox(height: 20),
+              Text(
+                "Best Deals",
+                style:
+                    TextStyle(fontSize: 18, fontFamily: 'NotoSans-ExtraBold'),
+              ),
+              StreamBuilder(
+                stream: FirebaseFirestore.instance
+                    .collection('Property')
+                    .snapshots(),
+                builder: (BuildContext context,
+                    AsyncSnapshot<QuerySnapshot> snapshot) {
+                  if (!snapshot.hasData) {
+                    return Center(child: CircularProgressIndicator());
+                  }
+                  return ListView(
+                    controller: controller,
+                    padding: EdgeInsets.zero,
+                    shrinkWrap: true,
+                    children: snapshot.data!.docs.map((document) {
+                      PropertyModel propertyModel = PropertyModel.fromMap(
+                          document.data() as Map<String, dynamic>);
+
+                      return InkWell(
                         child: BestDealCell(
-                            image: Image.asset(
-                              "assets/image/hotel.jpg",
-                              fit: BoxFit.fill,
-                            ),
-                            hotelName: "Grand royal Hotel",
-                            address: "Wembley, London",
-                            location: "2.0 km to city",
-                            price: "180"),
+                            address: document['PropertyAddress'],
+                            hotelName: document['PropertyName'],
+                            price: document['RentWeekDays'],
+                            location: document['PropertyCity'],
+                            sublocation: document['PropertyState']),
                         onTap: () {
                           pushNewScreen(
                             context,
-                            screen: details_farm(),
+                            screen: details_farm(propertyModel: propertyModel),
                             withNavBar:
                                 false, // OPTIONAL VALUE. True by default.
                             pageTransitionAnimation:
                                 PageTransitionAnimation.cupertino,
                           );
                         },
-                      )
-                    ],
+                      );
+                    }).toList(),
                   );
                 },
-              ),
-            ),
-            SizedBox(
-              height: 50,
-            )
-          ],
+              )
+            ],
+          ),
         ),
       ),
-    ));
+    );
   }
+
+  ScrollController controller = ScrollController();
 }

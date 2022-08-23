@@ -6,6 +6,7 @@ import 'package:resortbooking/User/Common/Color.dart';
 import 'package:resortbooking/User/Common/Constant.dart';
 import 'package:resortbooking/User/Common/Style.dart';
 import 'package:resortbooking/User/Common/TextField.dart';
+import 'package:resortbooking/User/Farm%20Detail/details.dart';
 
 Widget Cottage() {
   return StatefulBuilder(
@@ -20,7 +21,7 @@ Widget Cottage() {
                 color: Colors.black12, blurRadius: 20, offset: Offset(5, 5)),
           ]),
           child: appTextField(
-            textEditingController: guestCapacity,
+            textEditingController: Cottage_numberofbed,
             hintText: "Enter Number Of Bedrooms",
             keyboardType: TextInputType.phone,
             validation: (value) {
@@ -39,7 +40,7 @@ Widget Cottage() {
                 color: Colors.black12, blurRadius: 20, offset: Offset(5, 5)),
           ]),
           child: appTextField(
-            textEditingController: guestCapacity,
+            textEditingController: Cottage_guestCapacity,
             hintText: "Enter Number Of Guest Allowed",
             keyboardType: TextInputType.phone,
             validation: (value) {
@@ -58,7 +59,7 @@ Widget Cottage() {
                 color: Colors.black12, blurRadius: 20, offset: Offset(5, 5)),
           ]),
           child: appTextField(
-            textEditingController: Swimmingpoll,
+            textEditingController: Cottage_Swimmingpoll,
             hintText: "Common / Private",
             validation: (value) {
               if (value!.isEmpty) {
@@ -76,7 +77,7 @@ Widget Cottage() {
                 color: Colors.black12, blurRadius: 20, offset: Offset(5, 5)),
           ]),
           child: appTextField(
-            textEditingController: farmsize,
+            textEditingController: Cottage_size,
             hintText: "Sq Feet / Sq Yard / Vigha ect.",
             validation: (value) {
               if (value!.isEmpty) {
@@ -97,7 +98,7 @@ Widget Cottage() {
                 color: Colors.black12, blurRadius: 20, offset: Offset(5, 5)),
           ]),
           child: appTextField(
-            textEditingController: RentWeekdays,
+            textEditingController: Cottage_RentWeekdays,
             hintText: "24 Hours Rent",
             keyboardType: TextInputType.phone,
             validation: (value) {
@@ -116,7 +117,7 @@ Widget Cottage() {
                 color: Colors.black12, blurRadius: 20, offset: Offset(5, 5)),
           ]),
           child: appTextField(
-            textEditingController: RentWeekends,
+            textEditingController: Cottage_RentWeekends,
             hintText: "24 Hours Rent",
             keyboardType: TextInputType.phone,
             validation: (value) {
@@ -128,61 +129,34 @@ Widget Cottage() {
         ),
         heightSpace(20),
         Text("Allow additional guests", style: normalStyle),
-        Row(
-          children: [
-            Expanded(
-              child: Row(
-                children: [
-                  Radio(
-                      activeColor: rPrimarycolor,
-                      value: 1,
-                      groupValue: id,
-                      onChanged: (index) {
-                        setState(() {
-                          id = 1;
-                        });
-                      }),
-                  Text("Yes", style: normalStyle)
-                ],
-              ),
-            ),
-            Expanded(
-              child: Row(
-                children: [
-                  Radio(
-                      activeColor: rPrimarycolor,
-                      value: 2,
-                      groupValue: id,
-                      onChanged: (index) {
-                        setState(() {
-                          id = 2;
-                        });
-                      }),
-                  Text("No", textAlign: TextAlign.start, style: normalStyle)
-                ],
-              ),
-            ),
-          ],
-        ),
-        Text("Additional Guests Charge", style: normalStyle),
-        heightSpace(8),
-        Container(
-          decoration: BoxDecoration(boxShadow: [
-            BoxShadow(
-                color: Colors.black12, blurRadius: 20, offset: Offset(5, 5)),
-          ]),
-          child: appTextField(
-            textEditingController: AdditionalGuestCharge,
-            hintText: "Cost Per Additional Guest",
-            keyboardType: TextInputType.phone,
-            validation: (value) {
-              if (value!.isEmpty) {
-                return 'Enter Additional Guest Charge';
-              }
-            },
+        SimpleGroupedChips(
+          controller: controller,
+          values: ['yes', 'no'],
+          itemTitle: ['yes', 'no'],
+          chipGroupStyle: ChipGroupStyle.minimize(
+            backgroundColorItem: Colors.grey.shade400,
+            selectedColorItem: rPrimarycolor,
+            itemTitleStyle: TextStyle(fontSize: 14),
           ),
+          onItemSelected: ((selected) {
+            cottageadditionalguest = selected;
+
+            if (cottageadditionalguest == 'yes') {
+              setState(
+                () {
+                  Cottagevisible = true;
+                  CottageAdditionalGuestsCharge();
+                },
+              );
+            } else {
+              setState(() {
+                Cottagevisible = false;
+              });
+            }
+          }),
         ),
-        heightSpace(20),
+        heightSpace(10),
+        CottageAdditionalGuestsCharge(),
         Text("Cleaning Fees", style: normalStyle),
         heightSpace(8),
         Container(
@@ -191,7 +165,7 @@ Widget Cottage() {
                 color: Colors.black12, blurRadius: 20, offset: Offset(5, 5)),
           ]),
           child: appTextField(
-            textEditingController: CleaningFees,
+            textEditingController: Cottage_CleaningFees,
             hintText: "Per Stay Cleaning Fees (If Any)",
             keyboardType: TextInputType.phone,
             validation: (value) {
@@ -210,7 +184,7 @@ Widget Cottage() {
                 color: Colors.black12, blurRadius: 20, offset: Offset(5, 5)),
           ]),
           child: appTextField(
-            textEditingController: SecurityDeposit,
+            textEditingController: Cottage_SecurityDeposit,
             hintText: "Security Deposit (If Any)",
             keyboardType: TextInputType.phone,
             validation: (value) {
@@ -240,7 +214,20 @@ Widget Cottage() {
             "Fire Safety",
             "First Aid",
           ],
-          values: List.generate(12, (index) => index),
+          values: [
+            "Kichen",
+            "Kichen Accessories",
+            "Gas Cylinder",
+            "Water Filter",
+            "Table",
+            "Chair",
+            "Free Parking",
+            "CCTV Camera",
+            "Security",
+            "Generator",
+            "Fire Safety",
+            "First Aid",
+          ],
           groupStyle: GroupStyle(
             activeColor: rPrimarycolor,
             groupTitleStyle: TextStyle(fontFamily: 'NotoSans-Medium'),
@@ -249,7 +236,9 @@ Widget Cottage() {
           checkFirstElement: false,
           helperGroupTitle: true,
           onItemSelected: (data) {
-            print(data);
+            setState(() {
+              Cottage_Facilities = data;
+            });
           },
           isExpandableTitle: true,
         ),
@@ -267,7 +256,17 @@ Widget Cottage() {
               "Gym",
               "Swimming Pool",
             ],
-            values: List.generate(9, (index) => index),
+            values: [
+              "Air Conditioning",
+              "TV",
+              "Refrigerator",
+              "Microwave",
+              "Wi-Fi",
+              "Barbecue Area",
+              "Garden",
+              "Gym",
+              "Swimming Pool",
+            ],
             groupStyle: GroupStyle(
               activeColor: rPrimarycolor,
               groupTitleStyle: TextStyle(fontFamily: 'NotoSans-Medium'),
@@ -276,7 +275,9 @@ Widget Cottage() {
             checkFirstElement: false,
             helperGroupTitle: true,
             onItemSelected: (data) {
-              print(data);
+              setState(() {
+                Cottage_Amenities = data;
+              });
             },
             isExpandableTitle: true),
         heightSpace(20),
@@ -299,6 +300,9 @@ Widget Cottage() {
             'Alcohol Allowed',
             'Pets Allowed'
           ],
+          onItemSelected: (selected) => setState(() {
+            Cottage_Terms_and_Ruls = selected;
+          }),
           chipGroupStyle: ChipGroupStyle.minimize(
             backgroundColorItem: Colors.grey.shade400,
             selectedColorItem: rPrimarycolor,
@@ -316,7 +320,7 @@ Widget Cottage() {
                   color: Colors.black12, blurRadius: 20, offset: Offset(5, 5)),
             ]),
             child: appTextField(
-              textEditingController: AdditionalRule,
+              textEditingController: Cottage_AdditionalRule,
               hintText: "Enter Your Rules & Regulation",
               maxlines: 4,
               validation: (value) {
@@ -330,18 +334,23 @@ Widget Cottage() {
   );
 }
 
-final guestCapacity = TextEditingController();
-final numberofbed = TextEditingController();
-final numberofbath = TextEditingController();
-final numberofchair = TextEditingController();
-final Swimmingpoll = TextEditingController();
-final farmsize = TextEditingController();
-final RentWeekdays = TextEditingController();
-final RentWeekends = TextEditingController();
-final AdditionalGuestCharge = TextEditingController();
-final CleaningFees = TextEditingController();
-final SecurityDeposit = TextEditingController();
-final AdditionalRule = TextEditingController();
+String? cottageadditionalguest;
+final Cottage_guestCapacity = TextEditingController();
+final Cottage_numberofbed = TextEditingController();
+final Cottage_numberofbath = TextEditingController();
+final Cottage_numberofchair = TextEditingController();
+final Cottage_Swimmingpoll = TextEditingController();
+final Cottage_size = TextEditingController();
+final Cottage_RentWeekdays = TextEditingController();
+final Cottage_RentWeekends = TextEditingController();
+
+final Cottage_AdditionalGuestCharge = TextEditingController();
+final Cottage_CleaningFees = TextEditingController();
+final Cottage_SecurityDeposit = TextEditingController();
+final Cottage_AdditionalRule = TextEditingController();
+List<String> Cottage_Facilities = [];
+List<String> Cottage_Amenities = [];
+List<String> Cottage_Terms_and_Ruls = [];
 int id = 0;
 bool check = false;
 GroupController controller = GroupController();
@@ -349,3 +358,35 @@ GroupController multipleCheckController = GroupController(
   isMultipleSelection: true,
   initSelectedItem: List.generate(0, (index) => index),
 );
+Widget CottageAdditionalGuestsCharge() {
+  return Cottagevisible
+      ? Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text("Additional Guests Charge", style: normalStyle),
+            heightSpace(8),
+            Container(
+              decoration: BoxDecoration(boxShadow: [
+                BoxShadow(
+                    color: Colors.black12,
+                    blurRadius: 20,
+                    offset: Offset(5, 5)),
+              ]),
+              child: appTextField(
+                textEditingController: Cottage_AdditionalGuestCharge,
+                hintText: "Cost Per Additional Guest",
+                keyboardType: TextInputType.phone,
+                validation: (value) {
+                  if (value!.isEmpty) {
+                    return 'Enter Additional Guest Charge';
+                  }
+                },
+              ),
+            ),
+            heightSpace(20),
+          ],
+        )
+      : SizedBox();
+}
+
+bool Cottagevisible = false;

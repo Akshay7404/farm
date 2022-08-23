@@ -23,13 +23,13 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
         centerTitle: true,
         title: Text(
           "Favorite farm list",
-          style: TextStyle(fontFamily: 'NotoSans-Medium',color: Colors.black),
+          style: TextStyle(fontFamily: 'NotoSans-Medium', color: Colors.black),
         ),
       ),
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
         child: Container(
-          margin: EdgeInsets.only(left: 20,right: 20,top: 20),
+          margin: EdgeInsets.only(left: 20, right: 20, top: 20),
           child: Column(
             children: [
               Container(
@@ -39,25 +39,28 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
                   itemCount: 10,
                   padding: EdgeInsets.all(0),
                   gridDelegate:
-                  SliverWaterfallFlowDelegateWithFixedCrossAxisCount(crossAxisCount: 1),
+                      SliverWaterfallFlowDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 1),
                   itemBuilder: (context, index) {
                     return Column(
                       children: [
                         InkWell(
                           child: BestDealCell(
-                              image: Image.asset("assets/image/ic_effiletower.jpeg",fit: BoxFit.fill,),
+                              image: Image.asset(
+                                "assets/image/ic_effiletower.jpeg",
+                                fit: BoxFit.fill,
+                              ),
                               hotelName: "Grand royal Hotel",
                               address: "Wembley, London",
                               location: "2.0 km to city",
-                              price: "180"
-                          ),
+                              price: "180"),
                           onTap: () {
-                            pushNewScreen(
-                              context,
-                              screen: details_farm(),
-                              withNavBar: false, // OPTIONAL VALUE. True by default.
-                              pageTransitionAnimation: PageTransitionAnimation.cupertino,
-                            );
+                            // pushNewScreen(
+                            //   context,
+                            //   screen: details_farm(),
+                            //   withNavBar: false, // OPTIONAL VALUE. True by default.
+                            //   pageTransitionAnimation: PageTransitionAnimation.cupertino,
+                            // );
                           },
                         )
                       ],

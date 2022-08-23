@@ -1,15 +1,18 @@
-// ignore_for_file: prefer_const_literals_to_create_immutables, prefer_const_constructors
+// ignore_for_file: prefer_const_literals_to_create_immutables, prefer_const_constructors, prefer_interpolation_to_compose_strings
 
 import 'package:bouncing_widget/bouncing_widget.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:intl/intl.dart';
+import 'package:resortbooking/Model/Property_model.dart';
 import 'package:resortbooking/User/Common/Color.dart';
 import 'package:resortbooking/User/Common/Constant.dart';
 import 'package:resortbooking/User/Common/Style.dart';
 import 'package:resortbooking/User/Common/TextField.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class SearchFilter extends StatefulWidget {
   const SearchFilter({Key? key}) : super(key: key);
@@ -103,6 +106,45 @@ class _SearchFilterState extends State<SearchFilter> {
                         child: appTextField(
                             textEditingController: SearchNameController,
                             hintText: "Search by name")),
+                    StreamBuilder(
+                      stream: FirebaseFirestore.instance
+                          .collection('Property')
+                          .where('PropertyName',
+                              isGreaterThanOrEqualTo: SearchNameController.text)
+                          .snapshots(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.active) {
+                          if (snapshot.hasData) {
+                            QuerySnapshot Datasnapshot =
+                                snapshot.data as QuerySnapshot;
+
+                            if (Datasnapshot.docs.length > 0) {
+                              Map<String, dynamic> propertymap =
+                                  Datasnapshot.docs[0].data()
+                                      as Map<String, dynamic>;
+
+                              PropertyModel Search =
+                                  PropertyModel.fromMap(propertymap);
+
+                              return ListTile(
+                                title: Text(Search.PropertyName.toString()),
+                              );
+                            } else {
+                              return Text("No result found!");
+                            }
+                          } else if (snapshot.hasError) {
+                            return Center(
+                              child: Text("An Error Occured!.."),
+                            );
+                          } else {
+                            return Center(child: Text("No result Found"));
+                          }
+                        } else {
+                          return Center(child: CircularProgressIndicator());
+                        }
+                      },
+                    ),
                     SizedBox(height: 15),
                     Container(
                         decoration: BoxDecoration(
@@ -263,7 +305,7 @@ class _SearchFilterState extends State<SearchFilter> {
                       onPressed: () {}),
                 ),
               ],
-            )
+            ),
           ]),
         ));
   }

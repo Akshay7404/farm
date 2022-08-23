@@ -1,4 +1,5 @@
-// ignore_for_file: prefer_const_literals_to_create_immutables, prefer_const_constructors
+// ignore_for_file: prefer_const_literals_to_create_immutables, prefer_const_constructors, non_constant_identifier_names
+import 'dart:developer';
 
 import 'package:checkbox_grouped/checkbox_grouped.dart';
 import 'package:flutter/material.dart';
@@ -6,6 +7,8 @@ import 'package:resortbooking/User/Common/Color.dart';
 import 'package:resortbooking/User/Common/Constant.dart';
 import 'package:resortbooking/User/Common/Style.dart';
 import 'package:resortbooking/User/Common/TextField.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 Widget FarmHouse() {
   return StatefulBuilder(
@@ -19,7 +22,7 @@ Widget FarmHouse() {
               color: Colors.black12, blurRadius: 20, offset: Offset(5, 5)),
         ]),
         child: appTextField(
-          textEditingController: guestCapacity,
+          textEditingController: Farm_guestCapacity,
           hintText: "Enter Number Of Guest Allowed",
           keyboardType: TextInputType.phone,
           validation: (value) {
@@ -38,7 +41,7 @@ Widget FarmHouse() {
               color: Colors.black12, blurRadius: 20, offset: Offset(5, 5)),
         ]),
         child: appTextField(
-          textEditingController: Swimmingpoll,
+          textEditingController: Farm_Swimmingpoll,
           hintText: "Common / Private",
           validation: (value) {
             if (value!.isEmpty) {
@@ -56,7 +59,7 @@ Widget FarmHouse() {
               color: Colors.black12, blurRadius: 20, offset: Offset(5, 5)),
         ]),
         child: appTextField(
-          textEditingController: farmsize,
+          textEditingController: Farm_farmsize,
           hintText: "Sq Feet / Sq Yard / Vigha ect.",
           validation: (value) {
             if (value!.isEmpty) {
@@ -77,7 +80,7 @@ Widget FarmHouse() {
               color: Colors.black12, blurRadius: 20, offset: Offset(5, 5)),
         ]),
         child: appTextField(
-          textEditingController: RentWeekdays,
+          textEditingController: Farm_RentWeekdays,
           hintText: "24 Hours Rent",
           keyboardType: TextInputType.phone,
           validation: (value) {
@@ -96,73 +99,46 @@ Widget FarmHouse() {
               color: Colors.black12, blurRadius: 20, offset: Offset(5, 5)),
         ]),
         child: appTextField(
-          textEditingController: RentWeekends,
+          textEditingController: Farm_RentWeekends,
           hintText: "24 Hours Rent",
           keyboardType: TextInputType.phone,
           validation: (value) {
             if (value!.isEmpty) {
-              return 'Enyer foe Weekends / Holidays';
+              return 'Enter for Weekends / Holidays';
             }
           },
         ),
       ),
       heightSpace(20),
       Text("Allow additional guests", style: normalStyle),
-      Row(
-        children: [
-          Expanded(
-            child: Row(
-              children: [
-                Radio(
-                    activeColor: rPrimarycolor,
-                    value: 1,
-                    groupValue: id,
-                    onChanged: (index) {
-                      setState(() {
-                        id = 1;
-                      });
-                    }),
-                Text("Yes", style: normalStyle)
-              ],
-            ),
-          ),
-          Expanded(
-            child: Row(
-              children: [
-                Radio(
-                    activeColor: rPrimarycolor,
-                    value: 2,
-                    groupValue: id,
-                    onChanged: (index) {
-                      setState(() {
-                        id = 2;
-                      });
-                    }),
-                Text("No", textAlign: TextAlign.start, style: normalStyle)
-              ],
-            ),
-          ),
-        ],
-      ),
-      Text("Additional Guests Charge", style: normalStyle),
-      heightSpace(8),
-      Container(
-        decoration: BoxDecoration(boxShadow: [
-          BoxShadow(
-              color: Colors.black12, blurRadius: 20, offset: Offset(5, 5)),
-        ]),
-        child: appTextField(
-          textEditingController: AdditionalGuestCharge,
-          hintText: "Cost Per Additional Guest",
-          keyboardType: TextInputType.phone,
-          validation: (value) {
-            if (value!.isEmpty) {
-              return 'Enter Additional Guest Charge';
-            }
-          },
+      SimpleGroupedChips(
+        controller: controller,
+        values: ['yes', 'no'],
+        itemTitle: ['yes', 'no'],
+        chipGroupStyle: ChipGroupStyle.minimize(
+          backgroundColorItem: Colors.grey.shade400,
+          selectedColorItem: rPrimarycolor,
+          itemTitleStyle: TextStyle(fontSize: 14),
         ),
+        onItemSelected: ((selected) {
+          additionalguest = selected;
+
+          if (additionalguest == 'yes') {
+            setState(
+              () {
+                Farmvisible = true;
+                AdditionalGuestsCharge();
+              },
+            );
+          } else {
+            setState(() {
+              Farmvisible = false;
+            });
+          }
+        }),
       ),
-      heightSpace(20),
+      heightSpace(10),
+      AdditionalGuestsCharge(),
       Text("Cleaning Fees", style: normalStyle),
       heightSpace(8),
       Container(
@@ -171,7 +147,7 @@ Widget FarmHouse() {
               color: Colors.black12, blurRadius: 20, offset: Offset(5, 5)),
         ]),
         child: appTextField(
-          textEditingController: CleaningFees,
+          textEditingController: Farm_CleaningFees,
           hintText: "Per Stay Cleaning Fees (If Any)",
           keyboardType: TextInputType.phone,
           validation: (value) {
@@ -190,7 +166,7 @@ Widget FarmHouse() {
               color: Colors.black12, blurRadius: 20, offset: Offset(5, 5)),
         ]),
         child: appTextField(
-          textEditingController: SecurityDeposit,
+          textEditingController: Farm_SecurityDeposit,
           hintText: "Security Deposit (If Any)",
           keyboardType: TextInputType.phone,
           validation: (value) {
@@ -221,7 +197,21 @@ Widget FarmHouse() {
           "First Aid",
           "Caretaker / Captain"
         ],
-        values: List.generate(13, (index) => index),
+        values: [
+          "Kichen",
+          "Kichen Accessories",
+          "Gas Cylinder",
+          "Water Filter",
+          "Table",
+          "Chair",
+          "Free Parking",
+          "CCTV Camera",
+          "Security",
+          "Generator",
+          "Fire Safety",
+          "First Aid",
+          "Caretaker / Captain"
+        ],
         groupStyle: GroupStyle(
           activeColor: rPrimarycolor,
           groupTitleStyle: TextStyle(fontFamily: 'NotoSans-Medium'),
@@ -230,7 +220,9 @@ Widget FarmHouse() {
         checkFirstElement: false,
         helperGroupTitle: true,
         onItemSelected: (data) {
-          print(data);
+          setState(() {
+            Farm_Facilities_data = data;
+          });
         },
         isExpandableTitle: true,
       ),
@@ -248,7 +240,17 @@ Widget FarmHouse() {
             "Gym",
             "Swimming Pool",
           ],
-          values: List.generate(9, (index) => index),
+          values: [
+            "Air Conditioning",
+            "TV",
+            "Refrigerator",
+            "Microwave",
+            "Wi-Fi",
+            "Barbecue Area",
+            "Garden",
+            "Gym",
+            "Swimming Pool",
+          ],
           groupStyle: GroupStyle(
             activeColor: rPrimarycolor,
             groupTitleStyle: TextStyle(fontFamily: 'NotoSans-Medium'),
@@ -257,7 +259,9 @@ Widget FarmHouse() {
           checkFirstElement: false,
           helperGroupTitle: true,
           onItemSelected: (data) {
-            print(data);
+            setState(() {
+              Farm_Amenities_data = data;
+            });
           },
           isExpandableTitle: true),
       heightSpace(20),
@@ -280,12 +284,13 @@ Widget FarmHouse() {
           'Alcohol Allowed',
           'Pets Allowed'
         ],
+        onItemSelected: (selected) => setState(() {
+          Farm_Terms_and_Ruls = selected;
+        }),
         chipGroupStyle: ChipGroupStyle.minimize(
           backgroundColorItem: Colors.grey.shade400,
           selectedColorItem: rPrimarycolor,
-          itemTitleStyle: TextStyle(
-            fontSize: 14,
-          ),
+          itemTitleStyle: TextStyle(fontSize: 14),
         ),
       ),
       heightSpace(20),
@@ -297,7 +302,7 @@ Widget FarmHouse() {
                 color: Colors.black12, blurRadius: 20, offset: Offset(5, 5)),
           ]),
           child: appTextField(
-            textEditingController: AdditionalRule,
+            textEditingController: Farm_AdditionalRule,
             hintText: "Enter Your Rules & Regulation",
             maxlines: 4,
             validation: (value) {
@@ -310,22 +315,58 @@ Widget FarmHouse() {
   );
 }
 
-final guestCapacity = TextEditingController();
-final numberofbed = TextEditingController();
-final numberofbath = TextEditingController();
-final numberofchair = TextEditingController();
-final Swimmingpoll = TextEditingController();
-final farmsize = TextEditingController();
-final RentWeekdays = TextEditingController();
-final RentWeekends = TextEditingController();
-final AdditionalGuestCharge = TextEditingController();
-final CleaningFees = TextEditingController();
-final SecurityDeposit = TextEditingController();
-final AdditionalRule = TextEditingController();
+String? additionalguest;
+final Farm_guestCapacity = TextEditingController();
+final Farm_numberofbed = TextEditingController();
+final Farm_numberofbath = TextEditingController();
+final Farm_numberofchair = TextEditingController();
+final Farm_Swimmingpoll = TextEditingController();
+final Farm_farmsize = TextEditingController();
+final Farm_RentWeekdays = TextEditingController();
+final Farm_RentWeekends = TextEditingController();
+final Farm_AdditionalGuestCharge = TextEditingController();
+final Farm_CleaningFees = TextEditingController();
+final Farm_SecurityDeposit = TextEditingController();
+final Farm_AdditionalRule = TextEditingController();
 int id = 0;
-bool check = false;
+List<String> Farm_Facilities_data = [];
+List<String> Farm_Amenities_data = [];
+List<String> Farm_Terms_and_Ruls = [];
 GroupController controller = GroupController();
 GroupController multipleCheckController = GroupController(
   isMultipleSelection: true,
   initSelectedItem: List.generate(0, (index) => index),
 );
+
+Widget AdditionalGuestsCharge() {
+  return Farmvisible
+      ? Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text("Additional Guests Charge", style: normalStyle),
+            heightSpace(8),
+            Container(
+              decoration: BoxDecoration(boxShadow: [
+                BoxShadow(
+                    color: Colors.black12,
+                    blurRadius: 20,
+                    offset: Offset(5, 5)),
+              ]),
+              child: appTextField(
+                textEditingController: Farm_AdditionalGuestCharge,
+                hintText: "Cost Per Additional Guest",
+                keyboardType: TextInputType.phone,
+                validation: (value) {
+                  if (value!.isEmpty) {
+                    return 'Enter Additional Guest Charge';
+                  }
+                },
+              ),
+            ),
+            heightSpace(20),
+          ],
+        )
+      : SizedBox();
+}
+
+bool Farmvisible = false;

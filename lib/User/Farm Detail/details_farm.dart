@@ -1,5 +1,6 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:blurrycontainer/blurrycontainer.dart';
 import 'package:bouncing_widget/bouncing_widget.dart';
 import 'package:carousel_slider/carousel_slider.dart';
@@ -7,6 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:resortbooking/Model/Property_model.dart';
+import 'package:resortbooking/Model/user_model.dart';
 import 'package:resortbooking/User/Booking/FarmBooking.dart';
 import 'package:resortbooking/User/Common/Color.dart';
 import 'package:resortbooking/User/Common/Constant.dart';
@@ -15,9 +18,12 @@ import 'package:resortbooking/User/Common/Style.dart';
 import 'package:resortbooking/User/Farm%20Detail/details.dart';
 import 'package:like_button/like_button.dart';
 import 'package:resortbooking/User/Booking/FarmBooking.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class details_farm extends StatefulWidget {
-  const details_farm({Key? key}) : super(key: key);
+  final PropertyModel propertyModel;
+
+  const details_farm({Key? key, required this.propertyModel}) : super(key: key);
 
   @override
   State<details_farm> createState() => _details_farmState();
@@ -35,13 +41,17 @@ class _details_farmState extends State<details_farm> {
   @override
   void initState() {
     super.initState();
-
+    property = widget.propertyModel;
     _controller = ScrollController()
       ..addListener(() {
         _listener();
       });
   }
 
+  String? str;
+
+  PropertyModel property = PropertyModel();
+  Usermodel _usermodel = Usermodel();
   void _listener() {
     double offset = _controller.offset;
     var direction = _controller.position.userScrollDirection;
@@ -69,9 +79,11 @@ class _details_farmState extends State<details_farm> {
       _fromTop = _prevReverseOffset + difference;
       if (_fromTop < -_containerHeight) _fromTop = -_containerHeight;
     }
-
     setState(() {});
   }
+
+  User? user = FirebaseAuth.instance.currentUser;
+  Usermodel usermodel = Usermodel();
 
   @override
   Widget build(BuildContext context) {
@@ -127,7 +139,7 @@ class _details_farmState extends State<details_farm> {
                     )),
               ];
             },
-            body: FarmDetails()));
+            body: FarmDetails(property)));
   }
 
   Widget Hide() {
@@ -146,7 +158,7 @@ class _details_farmState extends State<details_farm> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("Grand Royal Hotel",
+                    Text("${property.PropertyName}",
                         style: TextStyle(
                             fontFamily: 'NotoSans-Bold',
                             fontSize: 20,
@@ -155,20 +167,23 @@ class _details_farmState extends State<details_farm> {
                     SizedBox(height: 3),
                     Row(
                       children: [
-                        Text("Wembley, London",
-                            style: TextStyle(
-                                fontFamily: 'NotoSans-Medium',
-                                color: Colors.white)),
-                        Icon(
-                          Icons.location_on,
-                          color: rPrimarycolor,
-                          size: 16,
+                        Flexible(
+                          child: Text("${property.PropertyAddress}",
+                              style: TextStyle(
+                                  fontFamily: 'NotoSans-Medium',
+                                  color: Colors.white),
+                              overflow: TextOverflow.ellipsis),
                         ),
-                        Text("2.0 km to city",
+                        Icon(Icons.location_on, color: rPrimarycolor, size: 16),
+                        Text("${property.PropertyCity}",
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(color: Colors.white)),
+                        widthSpace(3),
+                        Text("${property.PropertyState}",
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(color: Colors.white)),
                         Expanded(
-                          child: Text("\$180",
+                          child: Text("\₹${property.RentWeekDays}",
                               textAlign: TextAlign.end,
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
@@ -191,16 +206,6 @@ class _details_farmState extends State<details_farm> {
                               print(rating);
                             }),
                         SizedBox(width: 5),
-                        Text("80 Reviews",
-                            style: TextStyle(color: Colors.white)),
-                        Expanded(
-                          child: Text(
-                            "/per night",
-                            textAlign: TextAlign.end,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        )
                       ],
                     ),
                     SizedBox(height: 10),
@@ -219,7 +224,10 @@ class _details_farmState extends State<details_farm> {
                           ),
                           onPressed: () {
                             Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) => farmBooking(),
+                              builder: (context) => farmBooking(
+                                property: property,
+                                
+                              ),
                             ));
                           }),
                     ),

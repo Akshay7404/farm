@@ -36,6 +36,11 @@ dependencies:
   cupertino_icons: ^1.0.2
   geolocator: ^9.0.1
   checkbox_grouped: ^1.8.1
+  firebase_storage: ^10.3.5
+  file_picker: ^5.0.1
+
+
+
   
   
 
@@ -71,9 +76,11 @@ dev_dependencies:
   flutter_staggered_grid_view: ^0.6.2
   url_launcher: ^6.1.5
   firebase_core: ^1.20.0
-  firebase_auth: ^3.6.2
+  firebase_auth: ^3.6.3
   cloud_firestore: ^3.4.3
   flutter_secure_storage: ^5.1.0
+  uuid: ^3.0.6
+  csc_picker: ^0.2.6
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

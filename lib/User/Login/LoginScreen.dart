@@ -4,6 +4,8 @@ import 'package:bouncing_widget/bouncing_widget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:resortbooking/Admin/Home%20Page/NavigationBar.dart';
+import 'package:resortbooking/Admin/Property/Cottage.dart';
+import 'package:resortbooking/Model/user_model.dart';
 import 'package:resortbooking/SuperAdmin/HomeScreen/SuperAdminHome.dart';
 import 'package:resortbooking/User/Common/Color.dart';
 import 'package:resortbooking/User/Common/Constant.dart';
@@ -15,6 +17,7 @@ import 'package:resortbooking/User/Home%20Page/BottomNavigationBar.dart';
 import 'package:resortbooking/User/Sign%20Up/SignUpScreen.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -142,15 +145,6 @@ class LoginScreenState extends State<LoginScreen> {
                   BouncingWidget(
                     onPressed: () {
                       SignIn(email_control.text, pass_control.text);
-                      // if (_form.currentState!.validate() &&
-                      //     id == 2 &&
-                      //     owner_email == email_control.text &&
-                      //     owner_Pass == pass_control.text) {
-                      //   pushScreen(context, () => NavigationBarMenu(index: 0));
-                      // } else if (Admin_email == email_control.text ||
-                      //     Admin_Pass == email_control.text) {
-                      //   pushScreen(context, () => SuperAdminHome());
-                      // }
                     },
                     child: Container(
                       height: 50,
@@ -195,19 +189,34 @@ class LoginScreenState extends State<LoginScreen> {
     );
   }
 
+  bool loading = true;
   final storage = FlutterSecureStorage();
   String? errorMessage;
   final _auth = FirebaseAuth.instance;
+  FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
   Future<void> SignIn(String email, String password) async {
     if (_form.currentState!.validate()) {
       try {
         UserCredential credential = await _auth.signInWithEmailAndPassword(
             email: email, password: password);
-        // print(credential.user?.uid);
+
         await storage.write(key: "uid", value: credential.user?.uid);
+        User? user = await _auth.currentUser;
+
+        await _firestore.collection('users').doc(user!.uid).get().then((val) {
+          Usermodel loggedInUser =
+              Usermodel.fromMap(val.data() as Map<String, dynamic>);
+
+              print(loggedInUser.type);
+
+          loggedInUser.type == "Owner"
+              ? pushScreen(context, () => NavigationBarMenu(index: 0))
+              : pushScreen(context, () => BottomNavigationBarMenu(index: 0));
+          ;
+        });
 
         Fluttertoast.showToast(msg: "Login Sucessfully");
-        pushScreen(context, () => BottomNavigationBarMenu(index: 0));
       } on FirebaseAuthException catch (error) {
         switch (error.code) {
           case "invalid-email":
@@ -236,5 +245,8 @@ class LoginScreenState extends State<LoginScreen> {
         print(error.code);
       }
     }
+    setState(() {
+      loading = false;
+    });
   }
 }

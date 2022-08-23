@@ -6,17 +6,17 @@ import 'Color.dart';
 SizedBox appDevider() {
   return SizedBox(
       child: Divider(
-        color: rGrey,
-        thickness: 1,
-      ));
+    color: rGrey,
+    thickness: 1,
+  ));
 }
 
 SizedBox thinAppDevider() {
   return SizedBox(
       child: Divider(
-        color: rGrey,
-        thickness: 0.3,
-      ));
+    color: rGrey,
+    thickness: 0.3,
+  ));
 }
 
 Widget heightSpace(double space) {
@@ -31,14 +31,14 @@ Widget widthSpace(double space) {
   );
 }
 
-Widget BestDealCell(
-    {
-    Image ? image,
-    String ? hotelName,
-    String ? address,
-    String ? location,
-    String ? price,}
-    ){
+Widget BestDealCell({
+  Image? image,
+  String? hotelName,
+  String? address,
+  String? location,
+  String? sublocation,
+  String? price,
+}) {
   return Column(
     children: [
       Container(
@@ -47,9 +47,7 @@ Widget BestDealCell(
         decoration: BoxDecoration(
             boxShadow: [
               BoxShadow(
-                  color: Colors.black12,
-                  blurRadius: 10,
-                  offset: Offset(8, 8)),
+                  color: Colors.black12, blurRadius: 10, offset: Offset(8, 8)),
             ],
             borderRadius: BorderRadius.all(Radius.circular(10)),
             color: Colors.white),
@@ -73,50 +71,89 @@ Widget BestDealCell(
                   children: [
                     Text("${hotelName}",
                         style: TextStyle(
-                            fontFamily: 'NotoSans-Bold',
-                            fontSize: 16)),
+                            fontFamily: 'NotoSans-Bold', fontSize: 16)),
                     Text("${address}",
                         style: TextStyle(
                             fontFamily: 'NotoSans-Medium',
                             color: rGrey,
-                            fontSize: 13)),
+                            fontSize: 13),
+                        overflow: TextOverflow.ellipsis),
                     SizedBox(height: 20),
                     Row(
                       children: [
-                        Icon(Icons.location_on,color: rPrimarycolor,),
+                        Icon(
+                          Icons.location_on,
+                          color: rPrimarycolor,
+                        ),
                         Expanded(
-                            flex: 2,
-                            child: Text(
-                              "${location}",style: TextStyle(fontFamily: 'NotoSans-Medium',
-                                color: rGrey,fontSize: 13),
-                              overflow: TextOverflow.ellipsis,
-                            )),
+                          flex: 2,
+                          child: Row(
+                            children: [
+                              Text(
+                                "${location}",
+                                style: TextStyle(
+                                    fontFamily: 'NotoSans-Medium',
+                                    color: rGrey,
+                                    fontSize: 13),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              widthSpace(3),
+                              Flexible(
+                                child: Text(
+                                  "${sublocation}",
+                                  style: TextStyle(
+                                      fontFamily: 'NotoSans-Medium',
+                                      color: rGrey,
+                                      fontSize: 13),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
                         Expanded(
-                          child: Text("\$"+"${price}",
+                          child: Text("\₹" + "${price}",
                               textAlign: TextAlign.end,
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold)),
+                                  fontSize: 18, fontWeight: FontWeight.bold)),
                         )
                       ],
                     ),
                     Row(
                       children: [
-                        Icon(Icons.star,color: rPrimarycolor,size: 16,),
-                        Icon(Icons.star,color: rPrimarycolor,size: 16,),
-                        Icon(Icons.star,color: rPrimarycolor,size: 16,),
-                        Icon(Icons.star,color: rPrimarycolor,size: 16,),
-                        Icon(Icons.star_border,size: 16,),
-                        Expanded(
-                          child: Text(
-                            "/per night",
-                            textAlign: TextAlign.end,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                                color: Colors.grey.shade500),
-                          ),
-                        )
+                        Icon(
+                          Icons.star,
+                          color: rPrimarycolor,
+                          size: 16,
+                        ),
+                        Icon(
+                          Icons.star,
+                          color: rPrimarycolor,
+                          size: 16,
+                        ),
+                        Icon(
+                          Icons.star,
+                          color: rPrimarycolor,
+                          size: 16,
+                        ),
+                        Icon(
+                          Icons.star,
+                          color: rPrimarycolor,
+                          size: 16,
+                        ),
+                        Icon(
+                          Icons.star_border,
+                          size: 16,
+                        ),
+                        // Expanded(
+                        //   child: Text(
+                        //     "/per night",
+                        //     textAlign: TextAlign.end,
+                        //     overflow: TextOverflow.ellipsis,
+                        //     style: TextStyle(color: Colors.grey.shade500),
+                        //   ),
+                        // )
                       ],
                     ),
                   ],
@@ -151,7 +188,7 @@ Future<DateTime?> datePickerPopup(BuildContext context,
             textButtonTheme: TextButtonThemeData(
               style: TextButton.styleFrom(
                   primary: rPrimarycolor // button text color
-              ),
+                  ),
             ),
           ),
           child: child!,
@@ -173,8 +210,7 @@ void showToast(
       msg: text,
       toastLength: Toast.LENGTH_SHORT,
       gravity: gravity,
-       backgroundColor: Colors.black12,
+      backgroundColor: Colors.black12,
       textColor: Colors.black,
       fontSize: 16.0);
 }
-

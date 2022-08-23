@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, unnecessary_const
 
 import 'package:flutter/material.dart';
+import 'package:resortbooking/Model/FarmOwner_model.dart';
 import 'package:resortbooking/SuperAdmin/Farm%20Owner%20Panel/DeleteFarmOwner.dart';
 import 'package:resortbooking/SuperAdmin/Farm%20Owner%20Panel/FarmHouseImage.dart';
 import 'package:resortbooking/User/Common/Color.dart';
@@ -9,15 +10,25 @@ import 'package:resortbooking/User/Common/Navigators.dart';
 import 'package:resortbooking/User/Common/Style.dart';
 import 'package:resortbooking/User/Common/TextField.dart';
 import 'package:intl/intl.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 
 class FarmOwnerDetails extends StatefulWidget {
-  const FarmOwnerDetails({Key? key}) : super(key: key);
+  final FarmOwnermodel farmmodel;
+  const FarmOwnerDetails({Key? key, required this.farmmodel}) : super(key: key);
 
   @override
   State<FarmOwnerDetails> createState() => _FarmOwnerDetailsState();
 }
 
 class _FarmOwnerDetailsState extends State<FarmOwnerDetails> {
+  @override
+  void initState() {
+    farmOwnermodel = widget.farmmodel;
+    super.initState();
+  }
+
+  late FarmOwnermodel farmOwnermodel;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -45,8 +56,9 @@ class _FarmOwnerDetailsState extends State<FarmOwnerDetails> {
                   width: 140,
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(10),
-                    child:
-                        Image.asset('assets/image/man.png', fit: BoxFit.fill),
+                    child: Image.network(
+                        '${farmOwnermodel.ProfilePic.toString()}',
+                        fit: BoxFit.fill),
                   ),
                 ),
                 Container(
@@ -56,69 +68,67 @@ class _FarmOwnerDetailsState extends State<FarmOwnerDetails> {
                     children: [
                       Text("Name",
                           style: TextStyle(fontFamily: 'NotoSans-Medium')),
-                      Text("abcd abcd", style: normalStyle),
+                      Text(
+                          "${farmOwnermodel.FarmOwnerFName} ${farmOwnermodel.FarmOwnerLName}",
+                          style: normalStyle),
                       heightSpace(10),
                       Text("E-mail",
                           style: TextStyle(fontFamily: 'NotoSans-Medium')),
-                      Text("Abcd@gmail.com", style: normalStyle),
+                      Text("${farmOwnermodel.FarmOwnerEmail}",
+                          style: normalStyle),
                       heightSpace(10),
                       Text("Phome Number",
                           style: TextStyle(fontFamily: 'NotoSans-Medium')),
-                      Text("+91 1234567890", style: normalStyle),
+                      Text("${farmOwnermodel.PhoneNumber}", style: normalStyle),
                     ],
                   ),
                 ),
               ],
             ),
-            Text("City / Pincode",
-                style: TextStyle(fontFamily: 'NotoSans-Medium')),
-            Text("Surat - 395009", style: normalStyle),
+            Text("City", style: TextStyle(fontFamily: 'NotoSans-Medium')),
+            Text("${farmOwnermodel.City}", style: normalStyle),
             heightSpace(10),
             Text("State", style: TextStyle(fontFamily: 'NotoSans-Medium')),
-            Text("Gujrat", style: normalStyle),
+            Text("${farmOwnermodel.Country}", style: normalStyle),
             heightSpace(10),
             Text("Country", style: TextStyle(fontFamily: 'NotoSans-Medium')),
-            Text("India", style: normalStyle),
+            Text("${farmOwnermodel.State}", style: normalStyle),
             heightSpace(15),
             Text("Farm History",
                 style: TextStyle(fontFamily: 'NotoSans-Bold', fontSize: 16)),
-            DataTable(
-              columnSpacing: 10,
-              horizontalMargin: 1,
-              columns: [
-                DataColumn(
-                    label: Text('Farm Name', overflow: TextOverflow.ellipsis)),
-                DataColumn(
-                    label:
-                        Text('Farm Address', overflow: TextOverflow.ellipsis)),
-                DataColumn(
-                    label: Text('Farm Size', overflow: TextOverflow.ellipsis)),
-                DataColumn(
-                    label: Text('Farm Image', overflow: TextOverflow.ellipsis)),
-              ],
-              rows: [
-                DataRow(cells: [
-                  DataCell(Text('Rio Colina')),
-                  DataCell(Text('Digas,Surat')),
-                  DataCell(Text('500 Vaar')),
-                  DataCell(InkWell(
-                    onTap: () => pushScreen(context, () => FarmPhotos()),
-                    child:
-                        Text('Image', style: TextStyle(color: rPrimarycolor)),
-                  )),
-                ]),
-                DataRow(cells: [
-                  DataCell(Text('Palm Villa')),
-                  DataCell(Text('Dhoran Pardi,Surat')),
-                  DataCell(Text('500 Vaar')),
-                  DataCell(InkWell(
-                      onTap: () => pushScreen(context, () => FarmPhotos()),
-                      child: Text('Image',
-                          style: TextStyle(color: rPrimarycolor)))),
-                ]),
+            heightSpace(10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text("Farm Name"),
               ],
             ),
-            heightSpace(10),
+            StreamBuilder(
+              stream:
+                  FirebaseFirestore.instance.collection('Property').snapshots(),
+              builder: (BuildContext context,
+                  AsyncSnapshot<QuerySnapshot> snapshot) {
+                if (!snapshot.hasData) {
+                  return Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
+                return ListView(
+                  controller: controller,
+                  shrinkWrap: true,
+                  children: snapshot.data!.docs.map((document) {
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(document['PropertyName']),
+                      ],
+                    );
+                  }).toList(),
+                );
+              },
+            ),
             heightSpace(20),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -177,4 +187,6 @@ class _FarmOwnerDetailsState extends State<FarmOwnerDetails> {
 
   DateTime? SelectDate;
   final BlockUser = TextEditingController();
+  ScrollController controller = ScrollController();
 }
+//

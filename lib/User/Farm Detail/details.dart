@@ -5,6 +5,8 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
+import 'package:resortbooking/Model/Property_model.dart';
+import 'package:resortbooking/Model/user_model.dart';
 import 'package:resortbooking/User/Booking/FarmBooking.dart';
 import 'package:resortbooking/User/Common/Color.dart';
 import 'package:resortbooking/User/Common/Constant.dart';
@@ -17,6 +19,9 @@ import 'package:resortbooking/User/google%20map/GoogleMap.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import 'FarmHouseDetails.dart';
+import 'VillaDetails.dart';
+
 final List HotelImg = [
   'assets/image/bath.jpg',
   'assets/image/dinner.jpg',
@@ -25,7 +30,8 @@ final List HotelImg = [
   'assets/image/room.jpg',
 ];
 bool ShowText = false;
-Widget FarmDetails() {
+
+Widget FarmDetails(PropertyModel propertyModel) {
   return StatefulBuilder(
     builder: (context, setState) => SingleChildScrollView(
       child: Container(
@@ -35,11 +41,11 @@ Widget FarmDetails() {
           children: [
             Row(
               children: [
-                Text("Grand Royal Hotel",
+                Text("${propertyModel.PropertyName}",
                     style:
                         TextStyle(fontFamily: 'NotoSans-Bold', fontSize: 20)),
                 Expanded(
-                  child: Text("\$180",
+                  child: Text("\₹${propertyModel.RentWeekDays}",
                       textAlign: TextAlign.end,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
@@ -52,36 +58,28 @@ Widget FarmDetails() {
             SizedBox(height: 3),
             Row(
               children: [
-                Text("Wembley, London", style: normalStyle),
-                Icon(
-                  Icons.location_on,
-                  color: rPrimarycolor,
-                ),
+                Icon(Icons.location_on, color: rPrimarycolor),
                 Text(
-                  "2.0 km to city",
+                  "${propertyModel.PropertyCity}",
                   overflow: TextOverflow.ellipsis,
                   style: normalStyle,
                 ),
-                Expanded(
-                  child: Text(
-                    "/per night",
-                    textAlign: TextAlign.end,
-                    overflow: TextOverflow.ellipsis,
-                    style: normalStyle,
-                  ),
-                )
+                widthSpace(3),
+                Text(
+                  "${propertyModel.PropertyState}",
+                  overflow: TextOverflow.ellipsis,
+                  style: normalStyle,
+                ),
               ],
             ),
             heightSpace(5),
             thinAppDevider(),
             heightSpace(5),
-            Text("Summary",
+            Text("Address",
                 style: TextStyle(fontFamily: 'NotoSans-Bold', fontSize: 16)),
             SizedBox(width: 3),
-            Text(
-                "Featuring a fitness center, Garde Royal Park Hote is located in Sweden, 4.7 km frome National Museum Garde Royal Park Hote is located in Sweden, 4.7 km frome National MuseumGarde Royal Park Hote is located in Sweden, 4.7 km frome National Museum",
-                maxLines: ShowText ? 8 : 2,
-                style: normalStyle),
+            Text("${propertyModel.PropertyAddress}",
+                maxLines: ShowText ? 8 : 1, style: normalStyle),
             InkWell(
               onTap: () {
                 setState(() {
@@ -98,37 +96,10 @@ Widget FarmDetails() {
               ]),
             ),
             heightSpace(20),
-            Container(
-                child: Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    children: [
-                      Icon(Icons.home, size: 30),
-                      Text("Type"),
-                      Text("Farm House", style: normalStyle),
-                      heightSpace(10),
-                      Icon(Icons.bed, size: 30),
-                      Text("Bedrooms"),
-                      Text("2 Bedrooms", style: normalStyle)
-                    ],
-                  ),
-                ),
-                Expanded(
-                    child: Column(
-                  children: [
-                    Icon(Icons.person, size: 30),
-                    Text("Guest Capacity"),
-                    Text("15 Guests", style: normalStyle),
-                    heightSpace(10),
-                    FaIcon(FontAwesomeIcons.sink),
-                    heightSpace(3),
-                    Text("Bath Rooms"),
-                    Text("2 Full", style: normalStyle)
-                  ],
-                ))
-              ],
-            )),
+            if (propertyModel.PropertyType == 'Villa')
+              Villa_Details(propertyModel),
+            if (propertyModel.PropertyType == 'Farm House')
+              FarmHouse_Details(propertyModel),
             SizedBox(height: 20),
             Container(
               height: 180,
@@ -250,10 +221,6 @@ Widget FarmDetails() {
               ),
             ),
             heightSpace(20),
-            Text("Details",
-                style: TextStyle(fontSize: 16, fontFamily: 'NotoSans-Bold')),
-            heightSpace(5),
-            Details(),
             SizedBox(height: 20),
             Row(
               children: [
@@ -356,23 +323,41 @@ Widget FarmDetails() {
             Text("Rent & Fees",
                 style: TextStyle(fontSize: 16, fontFamily: 'NotoSans-Bold')),
             heightSpace(5),
-            RentAndFees(),
+            if (propertyModel.PropertyType == 'Villa' ||
+                propertyModel.PropertyType == 'Cottage' ||
+                propertyModel.PropertyType == 'Farm House')
+              RentAndFees(propertyModel),
             heightSpace(10),
             Text("Features",
                 style: TextStyle(fontSize: 16, fontFamily: 'NotoSans-Bold')),
             heightSpace(5),
             Text("Amenities",
                 style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
-            Amenities(),
+            if (propertyModel.PropertyType == 'Villa')
+              Villa_Amenities(propertyModel),
+            // if (propertyModel.PropertyType == 'Tent') Tent_Amenities(),
+            // if (propertyModel.PropertyType == 'Cottage') Cottage_Amenities(),
+            if (propertyModel.PropertyType == 'Farm House')
+              Farm_Amenities(propertyModel),
             heightSpace(10),
             Text("Facilities",
                 style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
-            Facilities(),
+            if (propertyModel.PropertyType == 'Villa')
+              Villa_Facilities(propertyModel),
+            //   if (propertyModel.PropertyType == 'Tent') Tent_Facilities(),
+            //   if (propertyModel.PropertyType == 'Cottage') Cottage_Facilities(),
+            if (propertyModel.PropertyType == 'Farm House')
+              Farm_Facilities(propertyModel),
             heightSpace(10),
             Text("Guidelines & Rules",
                 style: TextStyle(fontSize: 16, fontFamily: 'NotoSans-Bold')),
             heightSpace(5),
-            Guidelines(),
+            if (propertyModel.PropertyType == 'Villa')
+              Villa_Guidelines(propertyModel),
+            // if (propertyModel.PropertyType == 'Tent') Tent_Guidelines(),
+            // if (propertyModel.PropertyType == 'Cottage') Cottage_Guidelines(),
+            if (propertyModel.PropertyType == 'Farm House')
+              Farm_Guidelines(propertyModel),
             heightSpace(10),
             Text("Terms & Condition",
                 style: TextStyle(fontSize: 16, fontFamily: 'NotoSans-Bold')),
@@ -441,7 +426,9 @@ Widget FarmDetails() {
                   ),
                   onPressed: () {
                     Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => farmBooking(),
+                      builder: (context) => farmBooking(
+                        property: propertyModel,
+                      ),
                     ));
                   }),
             ),
@@ -452,32 +439,42 @@ Widget FarmDetails() {
   );
 }
 
-Widget Guidelines() {
-  return Row(children: [
-    Expanded(
-      child: Column(
-        children: [
-          Guidelines_itm("No Alcohal Party"),
-          Guidelines_itm("No Smokking"),
-        ],
-      ),
-    ),
-    Expanded(
-      child: Column(
-        children: [
-          Guidelines_itm("No pats"),
-          Guidelines_itm("Non-veg not allowed")
-        ],
-      ),
-    )
-  ]);
-}
-
-Widget Guidelines_itm(String Title) {
+Widget Villa_Details(PropertyModel propertyModel) {
   return Row(
     children: [
-      Icon(Icons.arrow_forward_ios, color: rPrimarycolor, size: 15),
-      Flexible(child: Text(Title, style: normalStyle))
+      Expanded(
+        child: Column(
+          children: [
+            Icon(Icons.home, size: 30),
+            Text("Type"),
+            Text("${propertyModel.PropertyType}", style: normalStyle),
+            heightSpace(10),
+            Icon(Icons.bed, size: 30),
+            Text("Bedrooms"),
+            Text("${propertyModel.NumberOfBed}", style: normalStyle),
+          ],
+        ),
+      ),
+      Expanded(
+          child: Column(
+        children: [
+          FaIcon(FontAwesomeIcons.arrows),
+          Text("Farm size"),
+          Text("${propertyModel.PropertySize}", style: normalStyle),
+        ],
+      )),
+      Expanded(
+          child: Column(
+        children: [
+          Icon(Icons.person, size: 30),
+          Text("Guest Capacity"),
+          Text("${propertyModel.GuestCapacity}", style: normalStyle),
+          heightSpace(10),
+          FaIcon(FontAwesomeIcons.personSwimming),
+          Text("Swimming pool"),
+          Text("${propertyModel.SwimmingPool}", style: normalStyle),
+        ],
+      )),
     ],
   );
 }
@@ -542,81 +539,6 @@ CallHotel() async {
   } else {
     throw 'Could not launch $url';
   }
-}
-
-Widget Details() {
-  return Column(
-    children: [
-      Details_item("Type:", "Farm Type"),
-      Details_item("Size:", "400 Var"),
-      Details_item("BathRooms:", "2"),
-      Details_item("Beds:", "2"),
-      Details_item("Guests:", "15"),
-      Details_item("Swimming Pool:", "Private"),
-      Details_item("Extra Beds:", "3")
-    ],
-  );
-}
-
-Widget Details_item(String Title, String SubTitle) {
-  return Row(
-    children: [
-      Icon(Icons.arrow_forward_ios, color: rPrimarycolor, size: 15),
-      Text(Title, style: TextStyle(fontWeight: FontWeight.w400)),
-      widthSpace(3),
-      Text(SubTitle, style: normalStyle)
-    ],
-  );
-}
-
-Widget RentAndFees() {
-  return Column(children: [
-    RentAndFees_item("24 Hours:", "RS.4500"),
-    RentAndFees_item("Weekends:", "RS.6500"),
-    RentAndFees_item("Security Deposit:", "RS.2000"),
-    RentAndFees_item("Allow Additional Guests:", "Yes"),
-  ]);
-}
-
-Widget RentAndFees_item(String Title, String SubTitle) {
-  return Row(
-    children: [
-      Icon(Icons.arrow_forward_ios, color: rPrimarycolor, size: 15),
-      Text(Title, style: TextStyle(fontWeight: FontWeight.w400)),
-      widthSpace(3),
-      Text(SubTitle, style: normalStyle)
-    ],
-  );
-}
-
-Widget Amenities() {
-  return Row(children: [
-    Expanded(
-      child: Column(
-        children: [
-          Amenities_item("Air Conditioning"),
-          Amenities_item("Garden")
-        ],
-      ),
-    ),
-    Expanded(
-      child: Column(
-        children: [
-          Amenities_item("Refrigerator"),
-          Amenities_item("Swimming pool")
-        ],
-      ),
-    )
-  ]);
-}
-
-Widget Amenities_item(String Title) {
-  return Row(
-    children: [
-      Icon(Icons.arrow_forward_ios, color: rPrimarycolor, size: 15),
-      Text(Title, style: normalStyle)
-    ],
-  );
 }
 
 Widget Facilities() {
