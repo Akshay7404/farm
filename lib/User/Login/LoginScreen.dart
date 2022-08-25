@@ -208,8 +208,6 @@ class LoginScreenState extends State<LoginScreen> {
           Usermodel loggedInUser =
               Usermodel.fromMap(val.data() as Map<String, dynamic>);
 
-              print(loggedInUser.type);
-
           loggedInUser.type == "Owner"
               ? pushScreen(context, () => NavigationBarMenu(index: 0))
               : pushScreen(context, () => BottomNavigationBarMenu(index: 0));

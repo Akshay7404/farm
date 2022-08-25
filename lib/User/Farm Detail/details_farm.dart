@@ -22,8 +22,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class details_farm extends StatefulWidget {
   final PropertyModel propertyModel;
+  final String Dis;
 
-  const details_farm({Key? key, required this.propertyModel}) : super(key: key);
+  const details_farm({
+    Key? key,
+    required this.propertyModel,
+    required this.Dis,
+  }) : super(key: key);
 
   @override
   State<details_farm> createState() => _details_farmState();
@@ -42,6 +47,8 @@ class _details_farmState extends State<details_farm> {
   void initState() {
     super.initState();
     property = widget.propertyModel;
+    DiscountPrice = widget.Dis;
+    
     _controller = ScrollController()
       ..addListener(() {
         _listener();
@@ -49,7 +56,7 @@ class _details_farmState extends State<details_farm> {
   }
 
   String? str;
-
+  String? DiscountPrice;
   PropertyModel property = PropertyModel();
   Usermodel _usermodel = Usermodel();
   void _listener() {
@@ -139,7 +146,7 @@ class _details_farmState extends State<details_farm> {
                     )),
               ];
             },
-            body: FarmDetails(property)));
+            body: FarmDetails(property, DiscountPrice)));
   }
 
   Widget Hide() {
@@ -225,8 +232,7 @@ class _details_farmState extends State<details_farm> {
                           onPressed: () {
                             Navigator.of(context).push(MaterialPageRoute(
                               builder: (context) => farmBooking(
-                                property: property,
-                                
+                                property: property, Dis: DiscountPrice!,
                               ),
                             ));
                           }),

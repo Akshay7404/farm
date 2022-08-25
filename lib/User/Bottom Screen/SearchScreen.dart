@@ -128,7 +128,9 @@ class _SearchScreenState extends State<SearchScreen> {
                         onTap: () {
                           pushNewScreen(
                             context,
-                            screen: details_farm(propertyModel: propertyModel),
+                            screen: details_farm(
+                                propertyModel: propertyModel,
+                                Dis: document['DiscountPrice']),
                             withNavBar:
                                 false, // OPTIONAL VALUE. True by default.
                             pageTransitionAnimation:
@@ -139,7 +141,7 @@ class _SearchScreenState extends State<SearchScreen> {
                     }).toList(),
                   );
                 },
-              )
+              ),
             ],
           ),
         ),

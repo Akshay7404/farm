@@ -17,6 +17,8 @@ class PropertyModel {
   String? RentWeekEnds;
   String? AdditionalGuests;
   String? AdditionalGuestsCharge;
+  String? isDiscount;
+  String? DiscountPrice;
   String? CleaningFees;
   String? SecurityDeposit;
   List<dynamic>? Facilities;
@@ -43,6 +45,8 @@ class PropertyModel {
       this.RentWeekEnds,
       this.AdditionalGuests,
       this.AdditionalGuestsCharge,
+      this.isDiscount,
+      this.DiscountPrice,
       this.CleaningFees,
       this.SecurityDeposit,
       this.Facilities,
@@ -70,6 +74,8 @@ class PropertyModel {
         RentWeekEnds: map['RentWeekEnds'],
         AdditionalGuests: map['AdditionalGuests'],
         AdditionalGuestsCharge: map['AdditionalGuestsCharge'],
+        isDiscount: map['Discount'],
+        DiscountPrice: map['Discountprice'],
         CleaningFees: map['CleaningFees'],
         SecurityDeposit: map['SecurityDeposit'],
         Facilities: map['Facilities'],
@@ -84,9 +90,9 @@ class PropertyModel {
       'PhoneNumber': PhoneNumber,
       'PropertyName': PropertyName,
       'PropertyAddress': PropertyAddress,
-      'PropertyCounrty':PropertyCounrty,
+      'PropertyCounrty': PropertyCounrty,
       'PropertyState': PropertyState,
-      'PropertyCity':PropertyCity,
+      'PropertyCity': PropertyCity,
       'PropertyType': PropertyType,
       'NumberOfBed': NumberOfBed,
       'NumberOfSlipingBed': NumberOfSlipingBed,
@@ -97,6 +103,8 @@ class PropertyModel {
       'RentWeekEnds': RentWeekEnds,
       'AdditionalGuests': AdditionalGuests,
       'AdditionalGuestsCharge': AdditionalGuestsCharge,
+      'Discount': isDiscount,
+      'DiscountPrice': DiscountPrice,
       'CleaningFees': CleaningFees,
       'SecurityDeposit': SecurityDeposit,
       'Facilities': Facilities,

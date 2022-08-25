@@ -2,6 +2,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:resortbooking/Model/PayonFarm.dart';
+import 'package:resortbooking/Model/Property_model.dart';
 import 'package:resortbooking/User/Booking/ThankYouScreen.dart';
 import 'package:resortbooking/User/Common/Color.dart';
 import 'package:resortbooking/User/Common/Constant.dart';
@@ -10,9 +12,13 @@ import 'package:resortbooking/User/Common/Style.dart';
 import 'package:resortbooking/User/Common/TextField.dart';
 import 'package:bouncing_widget/bouncing_widget.dart';
 import 'package:resortbooking/User/Booking/ThankYouScreen.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class PayOnFarm extends StatefulWidget {
-  const PayOnFarm({Key? key}) : super(key: key);
+  final String date;
+  const PayOnFarm({Key? key, required this.date}) : super(key: key);
 
   @override
   State<PayOnFarm> createState() => _PayOnFarmState();
@@ -23,6 +29,13 @@ class _PayOnFarmState extends State<PayOnFarm> {
   final EmailController = TextEditingController();
   final PhoneController = TextEditingController();
   final _form = GlobalKey<FormState>();
+  String? selectdate;
+  User? user = FirebaseAuth.instance.currentUser;
+  @override
+  void initState() {
+    selectdate = widget.date;
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -102,12 +115,14 @@ class _PayOnFarmState extends State<PayOnFarm> {
                       }
                     },
                   )),
+              Text("${selectdate}"),
               Expanded(
                 child: Align(
                   alignment: Alignment.bottomCenter,
                   child: BouncingWidget(
                     onPressed: () {
                       if (_form.currentState!.validate()) {
+                        AddPayOnFarmtoFirestore();
                         pushScreen(context, () => thankYouScreen());
                       } else {
                         null;
@@ -132,5 +147,35 @@ class _PayOnFarmState extends State<PayOnFarm> {
         ),
       ),
     );
+  }
+
+  String payment = "Pay on Farm";
+  void AddPayOnFarmtoFirestore() async {
+    await FirebaseFirestore.instance
+        .collection('Property')
+        .doc(user!.uid)
+        .get()
+        .then((value) {
+      PropertyModel model =
+          PropertyModel.fromMap(value.data() as Map<String, dynamic>);
+
+      PaymentProoerty addpayonfarm = PaymentProoerty(
+          Name: NameController.text,
+          Email: EmailController.text,
+          PhoneNumber: PhoneController.text,
+          selectdate: selectdate,
+          PaymentMethod: payment,
+          PropertyName: model.PropertyName,
+          PropertyAddress: model.PropertyAddress,
+          PropertyPhone: model.PhoneNumber);
+
+      FirebaseFirestore.instance
+          .collection('users')
+          .doc(user!.uid)
+          .collection('Payment')
+          .add(addpayonfarm.toMap());
+
+      Fluttertoast.showToast(msg: "Pay on farm successfully :) ");
+    });
   }
 }

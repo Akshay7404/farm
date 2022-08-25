@@ -11,7 +11,8 @@ class Usermodel {
   String? Password;
   String? type;
   List<String>? Favorite;
-  DateTime? selectdate;
+  String? selectdate;
+  String? PaymentOption;
 
   Usermodel(
       {this.UserId,
@@ -26,7 +27,8 @@ class Usermodel {
       this.Password,
       this.type,
       this.Favorite,
-      this.selectdate});
+      this.selectdate,
+      this.PaymentOption});
 
   factory Usermodel.fromMap(Map<String, dynamic> map) {
     return Usermodel(
@@ -44,7 +46,8 @@ class Usermodel {
         Favorite: map["Favorite"] == null
             ? []
             : map["Favorite"].map<String>((i) => i as String).toList(),
-        selectdate: null);
+        selectdate: map['selectdate'],
+        PaymentOption: map['PaymentOption']);
   }
   Map<String, dynamic> toMap() {
     return {
@@ -61,6 +64,7 @@ class Usermodel {
       'Favorite': Favorite,
       'type': type,
       'selectdate': selectdate,
+      'PaymentOption': PaymentOption
     };
   }
 }

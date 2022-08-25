@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:resortbooking/Model/Property_model.dart';
 import 'package:resortbooking/Model/user_model.dart';
+import 'package:resortbooking/User/Common/Navigators.dart';
 import 'package:resortbooking/User/Common/Style.dart';
 import 'package:resortbooking/User/Common/Color.dart';
 import 'package:resortbooking/User/Common/Constant.dart';
@@ -18,11 +19,16 @@ import '../Payments/PayOnFarm.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:ck_utils/ck_utils.dart';
 
 class farmBooking extends StatefulWidget {
   final PropertyModel property;
-
-  const farmBooking({Key? key, required this.property}) : super(key: key);
+  final String Dis;
+  const farmBooking({
+    Key? key,
+    required this.property,
+    required this.Dis,
+  }) : super(key: key);
 
   @override
   State<farmBooking> createState() => _farmBookingState();
@@ -34,13 +40,20 @@ class _farmBookingState extends State<farmBooking> {
   @override
   void initState() {
     propertyModel = widget.property;
-    getCurrentUser();
-    
+    DiscountPrice = widget.Dis;
+    disamt = int.parse(widget.Dis);
+    String? temp = propertyModel.RentWeekDays;
+    subtotal = int.parse(temp!);
+    total = subtotal - disamt;
+    print(total);
     super.initState();
   }
 
+  var disamt;
+  var subtotal;
+  var total;
   String? prifix;
-  List? contacts;
+  String? DiscountPrice;
   final TextEditingController SelectDatecontroller = TextEditingController();
 
   final List HotelImg = [
@@ -52,44 +65,7 @@ class _farmBookingState extends State<farmBooking> {
   ];
   int i = -1;
   late String dateCount;
-  late String range;
-
-  Widget select_date() {
-    return SfDateRangePicker(
-      showActionButtons: true,
-      enablePastDates: false,
-      allowViewNavigation: true,
-      navigationMode: DateRangePickerNavigationMode.scroll,
-      navigationDirection: DateRangePickerNavigationDirection.vertical,
-      selectionColor: rPrimarycolor,
-      rangeSelectionColor: Colors.teal.shade100,
-      endRangeSelectionColor: rPrimarycolor,
-      startRangeSelectionColor: rPrimarycolor,
-      onSelectionChanged: onSelectionChanged,
-      monthViewSettings: DateRangePickerMonthViewSettings(dayFormat: 'EEE'),
-      selectionMode: DateRangePickerSelectionMode.range,
-      initialSelectedRange: PickerDateRange(
-        DateTime.now().subtract(const Duration(days: 0)),
-        DateTime.now().add(const Duration(days: 0)),
-      ),
-      cancelText: 'CANCEL',
-      confirmText: 'OK',
-      onCancel: () {
-        SelectDatecontroller.text = "";
-        Navigator.pop(context);
-      },
-      onSubmit: (Object) async {
-        if (range == null || SelectDatecontroller.text == null) {
-          Fluttertoast.showToast(msg: "Please Select Date");
-        } else {
-          setState(() {
-            SelectDatecontroller.text = range.toString();
-            Navigator.pop(context);
-          });
-        }
-      },
-    );
-  }
+  String? range;
 
   void onSelectionChanged(DateRangePickerSelectionChangedArgs args) {
     setState(() {
@@ -109,34 +85,10 @@ class _farmBookingState extends State<farmBooking> {
 
   int id = 0;
   User? user = FirebaseAuth.instance.currentUser;
-  bool isLoading = false;
-  late Map<String, dynamic> userMap2;
-
-  void getCurrentUser() async {
-    FirebaseFirestore _firestore = FirebaseFirestore.instance;
-
-    final User? user = FirebaseAuth.instance.currentUser;
-    final uuid = user!.uid;
-
-    setState(() {
-      isLoading = true;
-    });
-
-    await _firestore
-        .collection('users')
-        .where("UserId", isEqualTo: uuid)
-        .get()
-        .then((value) {
-      setState(() {
-        userMap2 = value.docs[0].data();
-        isLoading = false;
-      });
-      print(userMap2);
-    });
-  }
-
-  late String dateTime;
-
+  DateTime? prefixDate;
+  DateTime? sufixDate;
+  DateTime? formattedprefixDate;
+  DateTime? formattedsufixDate;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -192,7 +144,7 @@ class _farmBookingState extends State<farmBooking> {
                             fontFamily: 'NotoSans-Medium',
                           )),
                       widthSpace(3),
-                      Text("${propertyModel.PropertyCity}",
+                      Text("${propertyModel.PropertyState}",
                           style: TextStyle(
                             fontFamily: 'NotoSans-Medium',
                           )),
@@ -207,92 +159,69 @@ class _farmBookingState extends State<farmBooking> {
                   ),
                   heightSpace(15),
                   Text(
-                    "Select Date",
+                    "Select Date.",
                     style: TextStyle(fontSize: 16, fontFamily: 'NotoSans-Bold'),
                   ),
                   heightSpace(10),
                   Container(
-                      decoration: BoxDecoration(
-                        boxShadow: [
-                          BoxShadow(
-                              color: Colors.black12,
-                              blurRadius: 15,
-                              offset: Offset(1.5, 1)),
-                        ],
-                      ),
-                      child: appTextField(
-                        textEditingController: SelectDatecontroller,
-                        hintText: "Select Date",
-                        isReadOnly: true,
-                        suffixIcon: IconButton(
-                            onPressed: null,
-                            icon: Icon(
-                              Icons.keyboard_arrow_right,
-                              color: rGrey,
-                            )),
-                        click: () {
-                          showModalBottomSheet(
-                              context: context,
-                              builder: (BuildContext context) =>
-                                  SfDateRangePicker(
-                                    showActionButtons: true,
-                                    enablePastDates: false,
-                                    allowViewNavigation: true,
-                                    navigationMode:
-                                        DateRangePickerNavigationMode.scroll,
-                                    navigationDirection:
-                                        DateRangePickerNavigationDirection
-                                            .vertical,
-                                    selectionColor: rPrimarycolor,
-                                    rangeSelectionColor: Colors.teal.shade100,
-                                    endRangeSelectionColor: rPrimarycolor,
-                                    startRangeSelectionColor: rPrimarycolor,
-                                    onSelectionChanged: onSelectionChanged,
-                                    monthViewSettings:
-                                        DateRangePickerMonthViewSettings(
-                                            dayFormat: 'EEE',
-                                            blackoutDates: [
-                                          // DateTime.parse(dateTime
-                                          //     .split(' ')
-                                          //     .first
-                                          //     .toString()
-                                          //     .trim()),
-                                          // DateTime.parse(dateTime
-                                          //     .split(' ')
-                                          //     .last
-                                          //     .toString()
-                                          //     .trim())
-                                        ]),
-                                    selectionMode:
-                                        DateRangePickerSelectionMode.range,
-                                    initialSelectedRange: PickerDateRange(
-                                      DateTime.now()
-                                          .subtract(const Duration(days: 0)),
-                                      DateTime.now()
-                                          .add(const Duration(days: 0)),
-                                    ),
-                                    cancelText: 'CANCEL',
-                                    confirmText: 'OK',
-                                    onCancel: () {
-                                      SelectDatecontroller.text = "";
-                                      Navigator.pop(context);
-                                    },
-                                    onSubmit: (Object) async {
-                                      if (range == null ||
-                                          SelectDatecontroller.text == null) {
-                                        Fluttertoast.showToast(
-                                            msg: "Please Select Date");
-                                      } else {
-                                        setState(() {
-                                          SelectDatecontroller.text =
-                                              range.toString();
-                                          Navigator.pop(context);
-                                        });
-                                      }
-                                    },
-                                  ));
-                        },
-                      )),
+                    decoration: BoxDecoration(
+                      boxShadow: [
+                        BoxShadow(
+                            color: Colors.black12,
+                            blurRadius: 15,
+                            offset: Offset(1.5, 1)),
+                      ],
+                    ),
+                    child: appTextField(
+                      textEditingController: SelectDatecontroller,
+                      hintText: "Select Date",
+                      isReadOnly: true,
+                      suffixIcon: IconButton(
+                          onPressed: null,
+                          icon: Icon(
+                            Icons.keyboard_arrow_right,
+                            color: rGrey,
+                          )),
+                      click: () {
+                        if (SelectDatecontroller.text.isNotEmpty) {}
+                        List<DateTime> datetimelist = [];
+                        FirebaseFirestore.instance
+                            .collection('users')
+                            .doc(user!.uid)
+                            .get()
+                            .then(
+                          (value) {
+                            Usermodel usermodel = Usermodel.fromMap(
+                                value.data() as Map<String, dynamic>);
+
+                            String str = usermodel.selectdate.toString();
+                            List<String> part = str.split("to");
+                            var prefix = part[0].trim();
+                            var sufix = part[1].trim();
+
+                            DateTime prefixDate =
+                                DateFormat("dd-MM-yyyy").parse(prefix);
+                            DateTime sufixDate =
+                                DateFormat("dd-MM-yyyy").parse(sufix);
+
+                            int Start = prefixDate.day.toInt();
+                            int end = sufixDate.day.toInt();
+                            for (int i = Start; i <= end; i++) {
+                              datetimelist.add(DateFormat("dd-MM-yyyy").parse(
+                                  "${i}-${prefixDate.month}-${prefixDate.year}"));
+                            }
+
+                            DateTime formattedprefixDate =
+                                DateFormat("dd-MM-yyyy").parse(
+                                    "${prefixDate.day}-${prefixDate.month}-${prefixDate.year}");
+                            DateTime formattedsufixDate =
+                                DateFormat("dd-MM-yyyy").parse(
+                                    "${sufixDate.day}-${sufixDate.month}-${sufixDate.year}");
+                          },
+                        );
+                      },
+                    ),
+                  ),
                   heightSpace(30),
                   Text("Payment Summary",
                       style:
@@ -312,7 +241,7 @@ class _farmBookingState extends State<farmBooking> {
                     children: [
                       Text("Discount",
                           style: TextStyle(fontFamily: 'NotoSans-Medium')),
-                      Text("- \$10",
+                      Text("- \₹${DiscountPrice}",
                           style: TextStyle(fontFamily: 'NotoSans-Bold')),
                     ],
                   ),
@@ -322,7 +251,7 @@ class _farmBookingState extends State<farmBooking> {
                     children: [
                       Text("Total",
                           style: TextStyle(fontFamily: 'NotoSans-Medium')),
-                      Text("\$170",
+                      Text("\₹${total}",
                           style: TextStyle(fontFamily: 'NotoSans-Bold')),
                     ],
                   ),
@@ -421,28 +350,19 @@ class _farmBookingState extends State<farmBooking> {
                   heightSpace(30),
                   BouncingWidget(
                     onPressed: () async {
-                      if (id == 1) {
-                        Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => CreditDebit_Card(),
-                        ));
-                      } else if (id == 2) {
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => PayOnFarm()));
-                      } else if (id == 3) {
-                        Navigator.of(context).push(
-                            MaterialPageRoute(builder: (context) => Paypal()));
-                      } else {
-                        showToast(text: "Please select payment method");
-                      }
-
-                      FirebaseFirestore.instance
-                          .collection('users')
-                          .doc("${user!.uid}")
-                          .update({
-                        'selectdate': SelectDatecontroller.text,
-                      });
-                      dateTime = userMap2['selectdate'];
-                      print(dateTime);
+                      id == 1
+                          ? pushScreen(
+                              context, () => CreditDebit_Card(date: range!))
+                          : range == null || SelectDatecontroller.text == null
+                              ? Fluttertoast.showToast(
+                                  msg: "please select date")
+                              : id == 2
+                                  ? pushScreen(
+                                      context, () => PayOnFarm(date: range!))
+                                  : id == 3
+                                      ? pushScreen(context, () => Paypal())
+                                      : Fluttertoast.showToast(
+                                          msg: "please select payment method");
                     },
                     child: Container(
                       height: 50,
@@ -465,4 +385,92 @@ class _farmBookingState extends State<farmBooking> {
       ),
     );
   }
+
+//  appTextField(
+//                       textEditingController: SelectDatecontroller,
+//                       hintText: "Select Date",
+//                       isReadOnly: true,
+//                       suffixIcon: IconButton(
+//                           onPressed: null,
+//                           icon: Icon(
+//                             Icons.keyboard_arrow_right,
+//                             color: rGrey,
+//                           )),
+//                       click: () {
+//                         if (SelectDatecontroller.text.isNotEmpty) {
+//                           FirebaseFirestore.instance
+//                               .collection('users')
+//                               .doc(user!.uid)
+//                               .get()
+//                               .then((value) {
+//                             Usermodel usermodel = Usermodel.fromMap(
+//                                 value.data() as Map<String, dynamic>);
+
+//                             print(user!.uid);
+
+//                             String str = usermodel.selectdate.toString();
+//                             List<String> part = str.split("to");
+//                             var prefix = part[0].trim();
+//                             var sufix = part[1].trim();
+
+//                             DateTime prefixDate =
+//                                 DateFormat("dd-MM-yyyy").parse(prefix);
+//                             DateTime sufixDate =
+//                                 DateFormat("dd-MM-yyyy").parse(sufix);
+
+//                             print(formattedprefixDate);
+//                             print(formattedsufixDate);
+//                           });
+//                         }
+
+//                         showModalBottomSheet(
+//                             context: context,
+//                             builder: (BuildContext context) =>
+//                                 SfDateRangePicker(
+//                                   showActionButtons: true,
+//                                   enablePastDates: false,
+//                                   allowViewNavigation: true,
+//                                   navigationMode:
+//                                       DateRangePickerNavigationMode.scroll,
+//                                   navigationDirection:
+//                                       DateRangePickerNavigationDirection
+//                                           .vertical,
+//                                   selectionColor: rPrimarycolor,
+//                                   rangeSelectionColor: Colors.teal.shade100,
+//                                   endRangeSelectionColor: rPrimarycolor,
+//                                   startRangeSelectionColor: rPrimarycolor,
+//                                   onSelectionChanged: onSelectionChanged,
+//                                   monthViewSettings:
+//                                       DateRangePickerMonthViewSettings(
+//                                           dayFormat: 'EEE',
+
+//                                   selectionMode:
+//                                       DateRangePickerSelectionMode.range,
+//                                   initialSelectedRange: PickerDateRange(
+//                                     DateTime.now()
+//                                         .subtract(const Duration(days: 0)),
+//                                     DateTime.now().add(const Duration(days: 0)),
+//                                   ),
+//                                   cancelText: 'CANCEL',
+//                                   confirmText: 'OK',
+//                                   onCancel: () {
+//                                     SelectDatecontroller.text = "";
+//                                     Navigator.pop(context);
+//                                   },
+//                                   onSubmit: (Object) async {
+//                                     if (range == null ||
+//                                         SelectDatecontroller.text == null) {
+//                                       Fluttertoast.showToast(
+//                                           msg: "Please Select Date");
+//                                     } else {
+//                                       setState(() {
+//                                         SelectDatecontroller.text =
+//                                             range.toString();
+//                                         Navigator.pop(context);
+//                                       });
+//                                     }
+//                                   },
+//                                 ));
+//                       },
+//                     ),;
 }

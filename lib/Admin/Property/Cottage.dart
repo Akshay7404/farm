@@ -194,6 +194,7 @@ Widget Cottage() {
             },
           ),
         ),
+        
         heightSpace(20),
         Text("Facilities & Amenities",
             style: TextStyle(fontFamily: 'NotoSans-Medium', fontSize: 18)),

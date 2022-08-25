@@ -31,7 +31,7 @@ final List HotelImg = [
 ];
 bool ShowText = false;
 
-Widget FarmDetails(PropertyModel propertyModel) {
+Widget FarmDetails(PropertyModel propertyModel, String? discountPrice) {
   return StatefulBuilder(
     builder: (context, setState) => SingleChildScrollView(
       child: Container(
@@ -52,7 +52,7 @@ Widget FarmDetails(PropertyModel propertyModel) {
                         fontSize: 18,
                         fontFamily: 'NotoSans-Bold',
                       )),
-                )
+                ),
               ],
             ),
             SizedBox(height: 3),
@@ -238,6 +238,7 @@ Widget FarmDetails(PropertyModel propertyModel) {
                 )
               ],
             ),
+
             SizedBox(height: 20),
             CarouselSlider(
               options: CarouselOptions(
@@ -319,6 +320,7 @@ Widget FarmDetails(PropertyModel propertyModel) {
                 ],
               ),
             ),
+
             Divider(),
             Text("Rent & Fees",
                 style: TextStyle(fontSize: 16, fontFamily: 'NotoSans-Bold')),
@@ -428,6 +430,7 @@ Widget FarmDetails(PropertyModel propertyModel) {
                     Navigator.of(context).push(MaterialPageRoute(
                       builder: (context) => farmBooking(
                         property: propertyModel,
+                        Dis: discountPrice!,
                       ),
                     ));
                   }),

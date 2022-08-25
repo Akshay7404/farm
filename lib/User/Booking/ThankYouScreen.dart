@@ -19,37 +19,52 @@ class _thankYouScreenState extends State<thankYouScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Column(
-        children: [
-          heightSpace(MediaQuery.of(context).size.height / 3),
-          Center(
-            child: Image.asset("assets/image/ic_right.jpg",height: 200,width: 200,),
-          ),
-          heightSpace(20),
-          Text("Thank you!", style: bigTitleStyle,),
-          heightSpace(20),
-          Text("Your farm has been booked...!", style: TextStyle(fontFamily: 'NotoSans-Medium',fontSize: 16),),
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: BouncingWidget(
-              onPressed: () {
-                pushReplacmentScreen(context, () => BottomNavigationBarMenu(index: 0,));
-              },
-              child: Container(
-                height: 50,
-                margin: EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.all(Radius.circular(32)),
-                  color: rPrimarycolor,
-                ),
-                child: Center(
-                  child: Text("Back to home",
-                      style: buttonStyle),
-                ),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            heightSpace(MediaQuery.of(context).size.height / 3),
+            Center(
+              child: Image.asset(
+                "assets/image/ic_right.jpg",
+                height: 200,
+                width: 200,
               ),
             ),
-          )
-        ],
+            heightSpace(20),
+            Text(
+              "Thank you!",
+              style: bigTitleStyle,
+            ),
+            heightSpace(20),
+            Text(
+              "Your farm has been booked...!",
+              style: TextStyle(fontFamily: 'NotoSans-Medium', fontSize: 16),
+            ),
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: BouncingWidget(
+                onPressed: () {
+                  pushReplacmentScreen(
+                      context,
+                      () => BottomNavigationBarMenu(
+                            index: 0,
+                          ));
+                },
+                child: Container(
+                  height: 50,
+                  margin: EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.all(Radius.circular(32)),
+                    color: rPrimarycolor,
+                  ),
+                  child: Center(
+                    child: Text("Back to home", style: buttonStyle),
+                  ),
+                ),
+              ),
+            )
+          ],
+        ),
       ),
     );
   }

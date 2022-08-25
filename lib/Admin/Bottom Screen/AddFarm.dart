@@ -347,12 +347,13 @@ class _AddFarmState extends State<AddFarm> {
     addFarmModel.RentWeekDays = Farm_RentWeekdays.text;
     addFarmModel.RentWeekEnds = Farm_RentWeekends.text;
     addFarmModel.AdditionalGuestsCharge = Farm_AdditionalGuestCharge.text;
+    addFarmModel.isDiscount = Discount.toString();
+    addFarmModel.DiscountPrice = Farm_Discount.text;
     addFarmModel.CleaningFees = Farm_CleaningFees.text;
     addFarmModel.SecurityDeposit = Farm_SecurityDeposit.text;
     addFarmModel.Facilities = Farm_Facilities_data;
     addFarmModel.Amenities = Farm_Amenities_data;
     addFarmModel.Terms_and_Ruls = Farm_Terms_and_Ruls;
-    addFarmModel.PropertyImage = Imageurl as List?;
 
     await firebaseFirestore.collection('Property').add(addFarmModel.toMap());
 
@@ -384,7 +385,6 @@ class _AddFarmState extends State<AddFarm> {
     addVillaModel.Facilities = Villa_Facilities;
     addVillaModel.Amenities = Villa_Amenities;
     addVillaModel.Terms_and_Ruls = Villa_Terms_and_Ruls;
-    addVillaModel.PropertyImage = Imageurl as List?;
 
     await firebaseFirestore.collection('Property').add(addVillaModel.toMap());
 
@@ -422,6 +422,29 @@ class _AddFarmState extends State<AddFarm> {
     Fluttertoast.showToast(msg: "Add Cottage sucessfully :) ");
   }
 
+  FirebaseStorage firebaseStorage = FirebaseStorage.instance;
+  void Upload(List<XFile> Images) async {
+    for (int i = 0; i < Images.length; i++) {
+      Imageurl = UploadImage(Images[i]);
+    }
+  }
+
+  Future<String>? Imageurl;
+  List<String> imageurls = [];
+  Future<String> UploadImage(XFile image) async {
+    Reference reference =
+        firebaseStorage.ref().child("Farm Image").child(image.name);
+    UploadTask uploadTask = reference.putFile(File(image.path));
+
+    TaskSnapshot snapshot = await uploadTask;
+
+    String Url = await snapshot.ref.getDownloadURL();
+    imageurls.add(Url);
+    print(imageurls);
+
+    return imageurls as Future<String>;
+  }
+
   void AddTentDetaistoFirestore() async {
     User? addtent = _auth.currentUser;
     PropertyModel addTentmodel = PropertyModel();
@@ -443,28 +466,10 @@ class _AddFarmState extends State<AddFarm> {
     addTentmodel.Amenities = Tent_Amenities;
     addTentmodel.Terms_and_Ruls = Tent_Terms_and_Ruls;
 
+    addTentmodel.PropertyImage = imageurls;
+
     await firebaseFirestore.collection('Property').add(addTentmodel.toMap());
 
     Fluttertoast.showToast(msg: "Add Tent Sucessfully :) ");
   }
-
-  Future<String> UploadImage(XFile image) async {
-    Reference reference =
-        firebaseStorage.ref().child("Farm Image").child(image.name);
-    UploadTask uploadTask = reference.putFile(File(image.path));
-
-    TaskSnapshot snapshot = await uploadTask;
-
-    print(snapshot);
-    return await snapshot.ref.getDownloadURL();
-  }
-
-  void Upload(List<XFile> Images) {
-    for (int i = 0; i < Images.length; i++) {
-      Imageurl = UploadImage(Images[i]);
-    }
-  }
-
-  Future<String>? Imageurl;
-  FirebaseStorage firebaseStorage = FirebaseStorage.instance;
 }

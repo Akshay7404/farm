@@ -177,6 +177,36 @@ Widget FarmHouse() {
         ),
       ),
       heightSpace(20),
+      Text("Farm House Discount", style: normalStyle),
+      heightSpace(8),
+      SimpleGroupedChips(
+        controller: controller,
+        values: ['yes', 'no'],
+        itemTitle: ['yes', 'no'],
+        chipGroupStyle: ChipGroupStyle.minimize(
+          backgroundColorItem: Colors.grey.shade400,
+          selectedColorItem: rPrimarycolor,
+          itemTitleStyle: TextStyle(fontSize: 14),
+        ),
+        onItemSelected: ((selected) {
+          Discount = selected;
+
+          if (Discount == 'yes') {
+            setState(
+              () {
+                discountvisible = true;
+                DiscountFarm();
+              },
+            );
+          } else {
+            setState(() {
+              discountvisible = false;
+            });
+          }
+        }),
+      ),
+      heightSpace(7),
+      DiscountFarm(),
       Text("Facilities & Amenities",
           style: TextStyle(fontFamily: 'NotoSans-Medium', fontSize: 18)),
       heightSpace(15),
@@ -315,6 +345,7 @@ Widget FarmHouse() {
   );
 }
 
+String? Discount;
 String? additionalguest;
 final Farm_guestCapacity = TextEditingController();
 final Farm_numberofbed = TextEditingController();
@@ -328,6 +359,7 @@ final Farm_AdditionalGuestCharge = TextEditingController();
 final Farm_CleaningFees = TextEditingController();
 final Farm_SecurityDeposit = TextEditingController();
 final Farm_AdditionalRule = TextEditingController();
+final Farm_Discount = TextEditingController();
 int id = 0;
 List<String> Farm_Facilities_data = [];
 List<String> Farm_Amenities_data = [];
@@ -369,4 +401,36 @@ Widget AdditionalGuestsCharge() {
       : SizedBox();
 }
 
+Widget DiscountFarm() {
+  return discountvisible
+      ? Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text("Farm House Discount", style: normalStyle),
+            heightSpace(8),
+            Container(
+              decoration: BoxDecoration(boxShadow: [
+                BoxShadow(
+                    color: Colors.black12,
+                    blurRadius: 20,
+                    offset: Offset(5, 5)),
+              ]),
+              child: appTextField(
+                textEditingController: Farm_Discount,
+                hintText: "Farm House Discount",
+                keyboardType: TextInputType.phone,
+                validation: (value) {
+                  if (value!.isEmpty) {
+                    return 'Enter Farm House Discount';
+                  }
+                },
+              ),
+            ),
+            heightSpace(20),
+          ],
+        )
+      : SizedBox();
+}
+
 bool Farmvisible = false;
+bool discountvisible = false;

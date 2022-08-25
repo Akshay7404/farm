@@ -3,14 +3,21 @@
 import 'package:flutter/material.dart';
 import 'package:bouncing_widget/bouncing_widget.dart';
 import 'package:intl/intl.dart';
+import 'package:resortbooking/Model/PayonFarm.dart';
+import 'package:resortbooking/Model/Property_model.dart';
+import 'package:resortbooking/Model/user_model.dart';
 import 'package:resortbooking/User/Booking/ThankYouScreen.dart';
 import 'package:resortbooking/User/Common/Color.dart';
 import 'package:resortbooking/User/Common/Constant.dart';
 import 'package:resortbooking/User/Common/Navigators.dart';
 import 'package:resortbooking/User/Common/Style.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class CreditDebit_Card extends StatefulWidget {
-  const CreditDebit_Card({Key? key}) : super(key: key);
+  final String date;
+  const CreditDebit_Card({Key? key, required this.date}) : super(key: key);
 
   @override
   State<CreditDebit_Card> createState() => _CreditDebit_CardState();
@@ -25,9 +32,12 @@ class _CreditDebit_CardState extends State<CreditDebit_Card> {
   @override
   void initState() {
     ExpDateController.text = "";
+    selectdate = widget.date;
     super.initState();
   }
 
+  User? user = FirebaseAuth.instance.currentUser;
+  String? selectdate;
   bool Check = false;
   final _form = GlobalKey<FormState>();
   @override
@@ -195,6 +205,7 @@ class _CreditDebit_CardState extends State<CreditDebit_Card> {
                 BouncingWidget(
                   onPressed: () {
                     if (_form.currentState!.validate() && Check == true) {
+                      AddCredit_DebitonFirestore();
                       pushScreen(context, () => thankYouScreen());
                     } else {
                       showToast(text: "Please check Acknowledgement");
@@ -210,11 +221,51 @@ class _CreditDebit_CardState extends State<CreditDebit_Card> {
                           child: Text("Add Credit card / Add Debit card",
                               style: buttonStyle))),
                 ),
+                heightSpace(20),
+                Text("${selectdate}")
               ],
             ),
           ),
         ),
       ),
     );
+  }
+
+  String payment = "Credit card/Debit card";
+  void AddCredit_DebitonFirestore() async {
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user!.uid)
+        .get()
+        .then((value) {
+      Usermodel model = Usermodel.fromMap(value.data() as Map<String, dynamic>);
+
+      FirebaseFirestore.instance
+          .collection('Property')
+          .doc(user!.uid)
+          .get()
+          .then((value) {
+        PropertyModel propertyModel =
+            PropertyModel.fromMap(value.data() as Map<String, dynamic>);
+
+        PaymentProoerty AddCreditDebit = PaymentProoerty(
+            PaymentMethod: payment,
+            selectdate: selectdate,
+            Email: model.UserEmail,
+            Name: model.UserFName,
+            PhoneNumber: model.PhoneNumber,
+            PropertyName: propertyModel.PropertyName,
+            PropertyAddress: propertyModel.PropertyAddress,
+            PropertyPhone: propertyModel.PhoneNumber);
+
+        FirebaseFirestore.instance
+            .collection('users')
+            .doc(user!.uid)
+            .collection('Payment')
+            .add(AddCreditDebit.toMap());
+
+        Fluttertoast.showToast(msg: "Payment Successfully :) ");
+      });
+    });
   }
 }
