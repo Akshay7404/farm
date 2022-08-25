@@ -189,36 +189,89 @@ class _farmBookingState extends State<farmBooking> {
                             .collection('users')
                             .doc(user!.uid)
                             .get()
-                            .then(
-                          (value) {
-                            Usermodel usermodel = Usermodel.fromMap(
-                                value.data() as Map<String, dynamic>);
+                            .then((value) {
+                          Usermodel usermodel = Usermodel.fromMap(
+                              value.data() as Map<String, dynamic>);
 
-                            String str = usermodel.selectdate.toString();
-                            List<String> part = str.split("to");
-                            var prefix = part[0].trim();
-                            var sufix = part[1].trim();
+                          String str = usermodel.selectdate.toString();
+                          List<String> part = str.split("to");
+                          var prefix = part[0].trim();
+                          var sufix = part[1].trim();
 
-                            DateTime prefixDate =
-                                DateFormat("dd-MM-yyyy").parse(prefix);
-                            DateTime sufixDate =
-                                DateFormat("dd-MM-yyyy").parse(sufix);
+                          DateTime prefixDate =
+                              DateFormat("dd-MM-yyyy").parse(prefix);
+                          DateTime sufixDate =
+                              DateFormat("dd-MM-yyyy").parse(sufix);
 
-                            int Start = prefixDate.day.toInt();
-                            int end = sufixDate.day.toInt();
-                            for (int i = Start; i <= end; i++) {
-                              datetimelist.add(DateFormat("dd-MM-yyyy").parse(
-                                  "${i}-${prefixDate.month}-${prefixDate.year}"));
-                            }
+                          int Start = prefixDate.day.toInt();
+                          int end = sufixDate.day.toInt();
+                          for (int i = Start; i <= end; i++) {
+                            datetimelist.add(DateFormat("dd-MM-yyyy").parse(
+                                "${i}-${prefixDate.month}-${prefixDate.year}"));
+                          }
 
-                            DateTime formattedprefixDate =
-                                DateFormat("dd-MM-yyyy").parse(
-                                    "${prefixDate.day}-${prefixDate.month}-${prefixDate.year}");
-                            DateTime formattedsufixDate =
-                                DateFormat("dd-MM-yyyy").parse(
-                                    "${sufixDate.day}-${sufixDate.month}-${sufixDate.year}");
-                          },
-                        );
+                          DateTime formattedprefixDate =
+                              DateFormat("dd-MM-yyyy").parse(
+                                  "${prefixDate.day}-${prefixDate.month}-${prefixDate.year}");
+                          DateTime formattedsufixDate = DateFormat("dd-MM-yyyy")
+                              .parse(
+                                  "${sufixDate.day}-${sufixDate.month}-${sufixDate.year}");
+                                  
+                                
+
+                          showModalBottomSheet(
+                              context: context,
+                              builder: (BuildContext context) =>
+                                  SfDateRangePicker(
+                                    showActionButtons: true,
+                                    enablePastDates: false,
+                                    allowViewNavigation: true,
+                                    navigationMode:
+                                        DateRangePickerNavigationMode.scroll,
+                                    navigationDirection:
+                                        DateRangePickerNavigationDirection
+                                            .vertical,
+                                    selectionColor: rPrimarycolor,
+                                    rangeSelectionColor: Colors.teal.shade100,
+                                    endRangeSelectionColor: rPrimarycolor,
+                                    startRangeSelectionColor: rPrimarycolor,
+                                    onSelectionChanged: onSelectionChanged,
+                                    monthViewSettings:
+                                        DateRangePickerMonthViewSettings(
+                                            dayFormat: 'EEE',
+                                            blackoutDates: SelectDatecontroller
+                                                    .text.isNotEmpty
+                                                ? datetimelist
+                                                : []),
+                                    selectionMode:
+                                        DateRangePickerSelectionMode.range,
+                                    initialSelectedRange: PickerDateRange(
+                                      DateTime.now()
+                                          .subtract(const Duration(days: 0)),
+                                      DateTime.now()
+                                          .add(const Duration(days: 0)),
+                                    ),
+                                    cancelText: 'CANCEL',
+                                    confirmText: 'OK',
+                                    onCancel: () {
+                                      SelectDatecontroller.text = "";
+                                      Navigator.pop(context);
+                                    },
+                                    onSubmit: (Object) async {
+                                      if (range == null ||
+                                          SelectDatecontroller.text == null) {
+                                        Fluttertoast.showToast(
+                                            msg: "Please Select Date");
+                                      } else {
+                                        setState(() {
+                                          SelectDatecontroller.text =
+                                              range.toString();
+                                          Navigator.pop(context);
+                                        });
+                                      }
+                                    },
+                                  ));
+                        });
                       },
                     ),
                   ),
