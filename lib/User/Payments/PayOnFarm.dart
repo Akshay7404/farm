@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:resortbooking/Model/PayonFarm.dart';
 import 'package:resortbooking/Model/Property_model.dart';
+import 'package:resortbooking/Model/user_model.dart';
 import 'package:resortbooking/User/Booking/ThankYouScreen.dart';
 import 'package:resortbooking/User/Common/Color.dart';
 import 'package:resortbooking/User/Common/Constant.dart';
@@ -18,7 +19,19 @@ import 'package:fluttertoast/fluttertoast.dart';
 
 class PayOnFarm extends StatefulWidget {
   final String date;
-  const PayOnFarm({Key? key, required this.date}) : super(key: key);
+  final PropertyModel propertyModel;
+  final disprise;
+  final subtotal;
+  final total;
+
+  const PayOnFarm(
+      {Key? key,
+      required this.date,
+      required this.propertyModel,
+      this.disprise,
+      this.subtotal,
+      this.total})
+      : super(key: key);
 
   @override
   State<PayOnFarm> createState() => _PayOnFarmState();
@@ -34,9 +47,18 @@ class _PayOnFarmState extends State<PayOnFarm> {
   @override
   void initState() {
     selectdate = widget.date;
+    disamt = widget.disprise;
+    subtotal = widget.subtotal;
+    total = widget.total;
+    property = widget.propertyModel;
+    print(total);
     super.initState();
   }
 
+  PropertyModel property = PropertyModel();
+  var disamt;
+  var subtotal;
+  var total;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -139,9 +161,10 @@ class _PayOnFarmState extends State<PayOnFarm> {
                         child: Text("Submit", style: buttonStyle),
                       ),
                     ),
+
                   ),
                 ),
-              )
+              ),Text("${property.PropertyAddress}")
             ],
           ),
         ),
@@ -152,12 +175,12 @@ class _PayOnFarmState extends State<PayOnFarm> {
   String payment = "Pay on Farm";
   void AddPayOnFarmtoFirestore() async {
     await FirebaseFirestore.instance
-        .collection('Property')
+        .collection('users')
         .doc(user!.uid)
         .get()
         .then((value) {
-      PropertyModel model =
-          PropertyModel.fromMap(value.data() as Map<String, dynamic>);
+      Usermodel model =
+          Usermodel.fromMap(value.data() as Map<String, dynamic>);
 
       PaymentProoerty addpayonfarm = PaymentProoerty(
           Name: NameController.text,
@@ -165,9 +188,12 @@ class _PayOnFarmState extends State<PayOnFarm> {
           PhoneNumber: PhoneController.text,
           selectdate: selectdate,
           PaymentMethod: payment,
-          PropertyName: model.PropertyName,
-          PropertyAddress: model.PropertyAddress,
-          PropertyPhone: model.PhoneNumber);
+          PropertyAddress: property.PropertyAddress,
+          PropertyName: property.PropertyName,
+          PropertyPhone: property.PhoneNumber,
+          subtotal: subtotal.toString(),
+          Discount: disamt.toString(),
+          total: total.toString());
 
       FirebaseFirestore.instance
           .collection('users')

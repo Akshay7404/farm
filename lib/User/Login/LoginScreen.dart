@@ -99,6 +99,7 @@ class LoginScreenState extends State<LoginScreen> {
                       ],
                     ),
                     child: appTextField(
+                      maxlines: 1,
                       textEditingController: pass_control,
                       hintText: "Enter your password",
                       isPassword: _passwordVisible,

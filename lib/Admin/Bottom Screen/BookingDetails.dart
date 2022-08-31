@@ -1,73 +1,152 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:flutter/material.dart';
+import 'package:resortbooking/Model/PayonFarm.dart';
+import 'package:resortbooking/Model/Property_model.dart';
+import 'package:resortbooking/Model/user_model.dart';
 import 'package:resortbooking/User/Common/Color.dart';
 import 'package:resortbooking/User/Common/Constant.dart';
 import 'package:resortbooking/User/Common/Style.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class BookingHistory_Admin extends StatefulWidget {
-  const BookingHistory_Admin({Key? key}) : super(key: key);
+  final Usermodel usermodel;
+
+  const BookingHistory_Admin({Key? key, required this.usermodel})
+      : super(key: key);
 
   @override
   State<BookingHistory_Admin> createState() => _BookingHistory_AdminState();
 }
 
 class _BookingHistory_AdminState extends State<BookingHistory_Admin> {
+  User? user = FirebaseAuth.instance.currentUser;
+  Usermodel model = Usermodel();
+
+  @override
+  void initState() {
+    model = widget.usermodel;
+    super.initState();
+  }
+
+  PropertyModel propertyModel = PropertyModel();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        iconTheme: IconThemeData(color: Colors.black),
-        backgroundColor: Colors.transparent,
-        elevation: 0.0,
-        titleSpacing: 0,
-        centerTitle: true,
-        title: Text(
-          "Farm Booking Details",
-          style: TextStyle(fontFamily: 'NotoSans-Medium', color: Colors.black),
+        appBar: AppBar(
+          iconTheme: IconThemeData(color: Colors.black),
+          backgroundColor: Colors.transparent,
+          elevation: 0.0,
+          titleSpacing: 0,
+          centerTitle: true,
+          title: Text(
+            "Farm Booking Details",
+            style:
+                TextStyle(fontFamily: 'NotoSans-Medium', color: Colors.black),
+          ),
         ),
-      ),
-      body: Container(
-        padding: EdgeInsets.all(10),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Container(
-                  height: 60,
-                  width: 60,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(10),
-                    child: Image.asset('assets/image/person.jpg',
-                        fit: BoxFit.fill),
-                  ),
-                ),
-                Container(
-                  margin: EdgeInsets.only(top: 10, left: 10, right: 10),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text("Alexia jane",
-                          style: TextStyle(fontFamily: 'NotoSans-Bold')),
-                      Text("AlexiaJane@gmail.com", style: normalStyle),
-                      Text("+91 1234567890", style: normalStyle),
-                      Text("Grand Royal Hotel",
-                          style: TextStyle(fontFamily: 'NotoSans-Medium')),
-                      Text("05-08-20022 to 07-08-2022",
-                          style: TextStyle(
-                              fontFamily: 'NotoSans-Medium',
-                              color: rGrey,
-                              fontSize: 13)),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            thinAppDevider()
-          ],
-        ),
-      ),
-    );
+        body: StreamBuilder(
+          stream: FirebaseFirestore.instance.collection('Payment').snapshots(),
+          builder:
+              (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot1) {
+            return StreamBuilder(
+              stream:
+                  FirebaseFirestore.instance.collection('Property').snapshots(),
+              builder: (BuildContext context,
+                  AsyncSnapshot<QuerySnapshot> snapshot2) {
+                List<PaymentProoerty?> list = snapshot1.data!.docs
+                    .map((document) => PaymentProoerty.fromMap(
+                        document.data() as Map<String, dynamic>))
+                    .toList();
+                List<PropertyModel?> list2 = snapshot2.data!.docs
+                    .map((document) => PropertyModel.fromMap(
+                        document.data() as Map<String, dynamic>))
+                    .toList();
+
+                if (snapshot1.connectionState == ConnectionState.waiting) {
+                  return Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
+                if (snapshot2.connectionState == ConnectionState.waiting) {
+                  return Center(child: CircularProgressIndicator());
+                }
+
+                return ListView.builder(
+                  itemCount: list.length,
+                  itemBuilder: (context, index) {
+                    print("id" + "${list[index]?.PropertyId}");
+                    return list[index]?.PropertyId ==
+                            FirebaseAuth.instance.currentUser!.uid
+                        ? Container(
+                            padding: EdgeInsets.only(left: 10, right: 10),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Container(
+                                      height: 60,
+                                      width: 60,
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(10),
+                                        child: Image.network(
+                                            "${list[index]?.profileUrl}",
+                                            fit: BoxFit.fill),
+                                      ),
+                                    ),
+                                    Container(
+                                      margin:
+                                          EdgeInsets.only(left: 10, right: 10),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text('${list[index]?.Name}',
+                                              style: TextStyle(
+                                                  fontFamily: 'NotoSans-Bold')),
+                                          Text("${list[index]?.Email}",
+                                              style: normalStyle),
+                                          Text("${list[index]?.PhoneNumber}",
+                                              style: normalStyle),
+                                          Text("${list[index]?.PropertyName}",
+                                              style: TextStyle(
+                                                  fontFamily:
+                                                      'NotoSans-Medium')),
+                                          Text("${list[index]?.selectdate}",
+                                              style: TextStyle(
+                                                  fontFamily: 'NotoSans-Medium',
+                                                  color: rGrey,
+                                                  fontSize: 13)),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                thinAppDevider(),
+                              ],
+                            ),
+                          )
+                        : SizedBox();
+                  },
+                );
+              },
+            );
+          },
+        ));
   }
+
+  List<String> docid = [];
+  FirebaseFirestore getid = FirebaseFirestore.instance;
+
+  void get() async {
+    final QuerySnapshot result = await getid.collection('users').get();
+    documents = result.docs;
+    documents.forEach((DOC) => docid.add(DOC.id));
+    print(docid);
+  }
+
+  late final List<DocumentSnapshot> documents;
 }

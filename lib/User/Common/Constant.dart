@@ -113,10 +113,8 @@ Widget BestDealCell({
                         ),
                         Expanded(
                           child: Text("\₹" + "${price}",
-                              textAlign: TextAlign.end,
-                              overflow: TextOverflow.ellipsis,
                               style: TextStyle(
-                                  fontSize: 18, fontWeight: FontWeight.bold)),
+                                  fontSize: 17, fontWeight: FontWeight.bold)),
                         )
                       ],
                     ),

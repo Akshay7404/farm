@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, sort_child_properties_last
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:resortbooking/Admin/Bottom%20Screen/BookingDetails.dart';
 import 'package:resortbooking/Admin/Logout/AdminLogOut.dart';
 import 'package:resortbooking/Admin/Pricacy%20Policy/PrivicyPolicyAdmin.dart';
 import 'package:resortbooking/Admin/Profile%20Screen/ChangePasswordAdmin.dart';
@@ -171,6 +172,32 @@ class _ProfileState extends State<Profile> {
                                 Icon(Icons.reviews, color: rGrey),
                                 SizedBox(width: 15),
                                 Text("User Reviews",
+                                    style: TextStyle(
+                                        fontFamily: 'NotoSans-Medium')),
+                              ],
+                            ),
+                          ),
+                        ),
+                        thinAppDevider(),
+                        Container(
+                          margin: EdgeInsets.only(top: 10, bottom: 10),
+                          child: InkWell(
+                            onTap: () {
+                              pushNewScreen(
+                                context,
+                                screen: BookingHistory_Admin(
+                                    usermodel: loggedInUser),
+                                withNavBar: false,
+                                pageTransitionAnimation:
+                                    PageTransitionAnimation.cupertino,
+                              );
+                            },
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Icon(Icons.calendar_today, color: rGrey),
+                                SizedBox(width: 15),
+                                Text("Booking Details",
                                     style: TextStyle(
                                         fontFamily: 'NotoSans-Medium')),
                               ],

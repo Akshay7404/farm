@@ -1,9 +1,10 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, unnecessary_const
 
 import 'package:flutter/material.dart';
-import 'package:resortbooking/Model/FarmOwner_model.dart';
+import 'package:resortbooking/Model/Property_model.dart';
+import 'package:resortbooking/Model/user_model.dart';
 import 'package:resortbooking/SuperAdmin/Farm%20Owner%20Panel/DeleteFarmOwner.dart';
-import 'package:resortbooking/SuperAdmin/Farm%20Owner%20Panel/FarmHouseImage.dart';
+import 'package:resortbooking/SuperAdmin/Farm%20Owner%20Panel/FarmHistoryDetails.dart';
 import 'package:resortbooking/User/Common/Color.dart';
 import 'package:resortbooking/User/Common/Constant.dart';
 import 'package:resortbooking/User/Common/Navigators.dart';
@@ -12,10 +13,13 @@ import 'package:resortbooking/User/Common/TextField.dart';
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-
 class FarmOwnerDetails extends StatefulWidget {
-  final FarmOwnermodel farmmodel;
-  const FarmOwnerDetails({Key? key, required this.farmmodel}) : super(key: key);
+  final Usermodel usermodel;
+
+  const FarmOwnerDetails({
+    Key? key,
+    required this.usermodel,
+  }) : super(key: key);
 
   @override
   State<FarmOwnerDetails> createState() => _FarmOwnerDetailsState();
@@ -23,12 +27,14 @@ class FarmOwnerDetails extends StatefulWidget {
 
 class _FarmOwnerDetailsState extends State<FarmOwnerDetails> {
   @override
+  late Usermodel user;
+
   void initState() {
-    farmOwnermodel = widget.farmmodel;
+    user = widget.usermodel;
+
     super.initState();
   }
 
-  late FarmOwnermodel farmOwnermodel;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -56,9 +62,8 @@ class _FarmOwnerDetailsState extends State<FarmOwnerDetails> {
                   width: 140,
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(10),
-                    child: Image.network(
-                        '${farmOwnermodel.ProfilePic.toString()}',
-                        fit: BoxFit.fill),
+                    child:
+                        Image.network('${user.ProfilePic}', fit: BoxFit.fill),
                   ),
                 ),
                 Container(
@@ -68,42 +73,34 @@ class _FarmOwnerDetailsState extends State<FarmOwnerDetails> {
                     children: [
                       Text("Name",
                           style: TextStyle(fontFamily: 'NotoSans-Medium')),
-                      Text(
-                          "${farmOwnermodel.FarmOwnerFName} ${farmOwnermodel.FarmOwnerLName}",
+                      Text("${user.UserFName} ${user.UserLName}",
                           style: normalStyle),
                       heightSpace(10),
                       Text("E-mail",
                           style: TextStyle(fontFamily: 'NotoSans-Medium')),
-                      Text("${farmOwnermodel.FarmOwnerEmail}",
-                          style: normalStyle),
+                      Text("${user.UserEmail}", style: normalStyle),
                       heightSpace(10),
                       Text("Phome Number",
                           style: TextStyle(fontFamily: 'NotoSans-Medium')),
-                      Text("${farmOwnermodel.PhoneNumber}", style: normalStyle),
+                      Text("${user.PhoneNumber}", style: normalStyle),
                     ],
                   ),
                 ),
               ],
             ),
+            heightSpace(10),
             Text("City", style: TextStyle(fontFamily: 'NotoSans-Medium')),
-            Text("${farmOwnermodel.City}", style: normalStyle),
+            Text("${user.City}", style: normalStyle),
             heightSpace(10),
             Text("State", style: TextStyle(fontFamily: 'NotoSans-Medium')),
-            Text("${farmOwnermodel.Country}", style: normalStyle),
+            Text("${user.State}", style: normalStyle),
             heightSpace(10),
             Text("Country", style: TextStyle(fontFamily: 'NotoSans-Medium')),
-            Text("${farmOwnermodel.State}", style: normalStyle),
+            Text("${user.Country}", style: normalStyle),
             heightSpace(15),
             Text("Farm History",
                 style: TextStyle(fontFamily: 'NotoSans-Bold', fontSize: 16)),
             heightSpace(10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text("Farm Name"),
-              ],
-            ),
             StreamBuilder(
               stream:
                   FirebaseFirestore.instance.collection('Property').snapshots(),
@@ -114,15 +111,29 @@ class _FarmOwnerDetailsState extends State<FarmOwnerDetails> {
                     child: CircularProgressIndicator(),
                   );
                 }
+
                 return ListView(
                   controller: controller,
                   shrinkWrap: true,
                   children: snapshot.data!.docs.map((document) {
-                    return Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    PropertyModel propertyModel = PropertyModel.fromMap(
+                        document.data() as Map<String, dynamic>);
+                    return Column(
                       children: [
-                        Text(document['PropertyName']),
+                        if (propertyModel.OwnerId == user.UserId)
+                          InkWell(
+                            child: Showdata(
+                                address: propertyModel.PropertyAddress,
+                                hotelName: propertyModel.PropertyName,
+                                location: propertyModel.PropertyState,
+                                sublocation: propertyModel.PropertyCity,
+                                price: propertyModel.RentWeekDays),
+                            onTap: () => pushScreen(
+                                context,
+                                () => FarmDetails(
+                                      propertyModel: propertyModel,
+                                    )),
+                          )
                       ],
                     );
                   }).toList(),
@@ -188,5 +199,97 @@ class _FarmOwnerDetailsState extends State<FarmOwnerDetails> {
   DateTime? SelectDate;
   final BlockUser = TextEditingController();
   ScrollController controller = ScrollController();
+
+  Widget Showdata({
+    Image? image,
+    String? hotelName,
+    String? address,
+    String? location,
+    String? sublocation,
+    String? price,
+  }) {
+    return Container(
+      margin: EdgeInsets.only(top: 20),
+      height: 130,
+      decoration: BoxDecoration(
+          boxShadow: [
+            BoxShadow(
+                color: Colors.black12, blurRadius: 10, offset: Offset(8, 8)),
+          ],
+          borderRadius: BorderRadius.all(Radius.circular(10)),
+          color: Colors.white),
+      child: Row(
+        children: [
+          Container(
+            height: 130,
+            width: 130,
+            child: ClipRRect(
+              borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(10),
+                  bottomLeft: Radius.circular(10)),
+              child: image,
+            ),
+          ),
+          Expanded(
+            flex: 3,
+            child: Container(
+              margin: EdgeInsets.only(top: 10, left: 10, right: 10),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text("${hotelName}",
+                      style:
+                          TextStyle(fontFamily: 'NotoSans-Bold', fontSize: 16)),
+                  Text("${address}",
+                      style: TextStyle(
+                          fontFamily: 'NotoSans-Medium',
+                          color: rGrey,
+                          fontSize: 13),
+                      overflow: TextOverflow.ellipsis),
+                  SizedBox(height: 20),
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.location_on,
+                        color: rPrimarycolor,
+                      ),
+                      Row(
+                        children: [
+                          Text(
+                            "${location}",
+                            style: TextStyle(
+                                fontFamily: 'NotoSans-Medium',
+                                color: rGrey,
+                                fontSize: 13),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          widthSpace(3),
+                          Text(
+                            "${sublocation}",
+                            style: TextStyle(
+                                fontFamily: 'NotoSans-Medium',
+                                color: rGrey,
+                                fontSize: 13),
+                            overflow: TextOverflow.ellipsis,
+                          )
+                        ],
+                      ),
+                      Expanded(
+                        child: Text("\₹" + "${price}",
+                            textAlign: TextAlign.end,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.bold)),
+                      )
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          )
+        ],
+      ),
+    );
+  }
 }
 //

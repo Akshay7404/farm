@@ -27,7 +27,6 @@ class _NavigationBarMenuState extends State<NavigationBarMenu> {
   List<Widget> _bottomNavigationItems = [
     HomeScreen(),
     AddFarm(),
-    BookingHistory_Admin(),
     Profile()
   ];
 
@@ -53,12 +52,7 @@ class _NavigationBarMenuState extends State<NavigationBarMenu> {
           activeColorPrimary: rPrimarycolor,
           inactiveIcon: Icon(Icons.add),
           inactiveColorPrimary: rGrey),
-      PersistentBottomNavBarItem(
-          icon: FaIcon(FontAwesomeIcons.calendarWeek, size: 22),
-          title: ("Booking Details"),
-          activeColorPrimary: rPrimarycolor,
-          inactiveIcon: FaIcon(FontAwesomeIcons.calendarWeek, size: 22),
-          inactiveColorPrimary: rGrey),
+    
       PersistentBottomNavBarItem(
           icon: Icon(Icons.person),
           title: ("Profile"),

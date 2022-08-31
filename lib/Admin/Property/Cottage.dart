@@ -194,7 +194,37 @@ Widget Cottage() {
             },
           ),
         ),
-        
+        heightSpace(20),
+        Text("Cottage Discount", style: normalStyle),
+        heightSpace(8),
+        SimpleGroupedChips(
+          controller: controller,
+          values: ['yes', 'no'],
+          itemTitle: ['yes', 'no'],
+          chipGroupStyle: ChipGroupStyle.minimize(
+            backgroundColorItem: Colors.grey.shade400,
+            selectedColorItem: rPrimarycolor,
+            itemTitleStyle: TextStyle(fontSize: 14),
+          ),
+          onItemSelected: ((selected) {
+            CottageDiscount = selected;
+
+            if (CottageDiscount == 'yes') {
+              setState(
+                () {
+                  Cottagediscountvisible = true;
+                  DiscountCottage();
+                },
+              );
+            } else {
+              setState(() {
+                Cottagediscountvisible = false;
+              });
+            }
+          }),
+        ),
+        heightSpace(7),
+        DiscountCottage(),
         heightSpace(20),
         Text("Facilities & Amenities",
             style: TextStyle(fontFamily: 'NotoSans-Medium', fontSize: 18)),
@@ -335,6 +365,7 @@ Widget Cottage() {
   );
 }
 
+String? CottageDiscount;
 String? cottageadditionalguest;
 final Cottage_guestCapacity = TextEditingController();
 final Cottage_numberofbed = TextEditingController();
@@ -344,7 +375,7 @@ final Cottage_Swimmingpoll = TextEditingController();
 final Cottage_size = TextEditingController();
 final Cottage_RentWeekdays = TextEditingController();
 final Cottage_RentWeekends = TextEditingController();
-
+final Cottage_Discount = TextEditingController();
 final Cottage_AdditionalGuestCharge = TextEditingController();
 final Cottage_CleaningFees = TextEditingController();
 final Cottage_SecurityDeposit = TextEditingController();
@@ -390,4 +421,36 @@ Widget CottageAdditionalGuestsCharge() {
       : SizedBox();
 }
 
+Widget DiscountCottage() {
+  return Cottagediscountvisible
+      ? Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text("Cottage Discount", style: normalStyle),
+            heightSpace(8),
+            Container(
+              decoration: BoxDecoration(boxShadow: [
+                BoxShadow(
+                    color: Colors.black12,
+                    blurRadius: 20,
+                    offset: Offset(5, 5)),
+              ]),
+              child: appTextField(
+                textEditingController: Cottage_Discount,
+                hintText: "Cottage Discount",
+                keyboardType: TextInputType.phone,
+                validation: (value) {
+                  if (value!.isEmpty) {
+                    return 'Enter Cottage Discount';
+                  }
+                },
+              ),
+            ),
+            heightSpace(20),
+          ],
+        )
+      : SizedBox();
+}
+
 bool Cottagevisible = false;
+bool Cottagediscountvisible = false;

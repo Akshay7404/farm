@@ -58,8 +58,7 @@ class MyApp extends StatelessWidget {
               print(usermodel.type);
               usermodel.type == "Owner"
                   ? pushScreen(context, () => NavigationBarMenu(index: 0))
-                  : pushScreen(
-                      context, () => BottomNavigationBarMenu(index: 0));
+                  : pushScreen(context, () => SuperAdminHome());
             },
           );
           return Center(child: CircularProgressIndicator());
@@ -70,6 +69,7 @@ class MyApp extends StatelessWidget {
 
   User? user = FirebaseAuth.instance.currentUser;
   final storage = FlutterSecureStorage();
+
   Future<bool> CheckLoginStatus() async {
     String? value = await storage.read(key: "uid");
     if (value == null) return false;

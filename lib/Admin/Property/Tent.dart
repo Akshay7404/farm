@@ -90,6 +90,38 @@ Widget Tent() {
             },
           ),
         ),
+
+        heightSpace(20),
+        Text("Tent Discount", style: normalStyle),
+        heightSpace(8),
+        SimpleGroupedChips(
+          controller: controller,
+          values: ['yes', 'no'],
+          itemTitle: ['yes', 'no'],
+          chipGroupStyle: ChipGroupStyle.minimize(
+            backgroundColorItem: Colors.grey.shade400,
+            selectedColorItem: rPrimarycolor,
+            itemTitleStyle: TextStyle(fontSize: 14),
+          ),
+          onItemSelected: ((selected) {
+            TentDiscount = selected;
+
+            if (TentDiscount == 'yes') {
+              setState(
+                () {
+                  Villadiscountvisible = true;
+                  DiscountTent();
+                },
+              );
+            } else {
+              setState(() {
+                Villadiscountvisible = false;
+              });
+            }
+          }),
+        ),
+        heightSpace(7),
+        DiscountTent(),
         heightSpace(20),
         Text("Facilities & Amenities",
             style: TextStyle(fontFamily: 'NotoSans-Medium', fontSize: 18)),
@@ -207,17 +239,50 @@ Widget Tent() {
     ),
   );
 }
-
+String? TentDiscount;
 final Tent_Slipingbeds = TextEditingController();
 final Tent_guestCapacity = TextEditingController();
 final Tent_RentWeekdays = TextEditingController();
 final Tent_RentWeekends = TextEditingController();
 final Tent_AdditionalRule = TextEditingController();
+final Tent_Discount = TextEditingController();
 List<String> Tent_Facilities = [];
 List<String> Tent_Amenities = [];
 List<String> Tent_Terms_and_Ruls = [];
 GroupController controller = GroupController();
+bool Villadiscountvisible = false;
 GroupController multipleCheckController = GroupController(
   isMultipleSelection: true,
   initSelectedItem: List.generate(0, (index) => index),
 );
+
+Widget DiscountTent() {
+  return Villadiscountvisible
+      ? Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text("Tent Discount", style: normalStyle),
+            heightSpace(8),
+            Container(
+              decoration: BoxDecoration(boxShadow: [
+                BoxShadow(
+                    color: Colors.black12,
+                    blurRadius: 20,
+                    offset: Offset(5, 5)),
+              ]),
+              child: appTextField(
+                textEditingController: Tent_Discount,
+                hintText: "Tent Discount",
+                keyboardType: TextInputType.phone,
+                validation: (value) {
+                  if (value!.isEmpty) {
+                    return 'Enter Tent Discount';
+                  }
+                },
+              ),
+            ),
+            heightSpace(20),
+          ],
+        )
+      : SizedBox();
+}

@@ -1,37 +1,22 @@
 // ignore_for_file: prefer_const_constructors
-
-import 'package:bouncing_widget/bouncing_widget.dart';
-import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/widgets.dart';
-import 'package:resortbooking/Admin/Property/Tent.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:resortbooking/Model/Property_model.dart';
-import 'package:resortbooking/User/Booking/FarmBooking.dart';
-import 'package:resortbooking/User/Common/Color.dart';
-import 'package:resortbooking/User/Common/Constant.dart';
-import 'package:resortbooking/User/Common/Navigators.dart';
-import 'package:resortbooking/User/Common/Style.dart';
-import 'package:resortbooking/User/Farm%20Detail/details.dart';
-import 'package:resortbooking/User/Farm%20Detail/details_farm.dart';
-import 'package:resortbooking/User/Farm%20Detail/photos.dart';
-import 'package:resortbooking/User/Farm%20Detail/reviews.dart';
-import 'package:resortbooking/User/google%20map/GoogleMap.dart';
+import '../../User/Common/Color.dart';
+import '../../User/Common/Constant.dart';
+import '../../User/Common/Style.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
-class MyFarm extends StatefulWidget {
+class FarmDetails extends StatefulWidget {
   final PropertyModel propertyModel;
 
-  const MyFarm({Key? key, required this.propertyModel}) : super(key: key);
+  const FarmDetails({Key? key, required this.propertyModel}) : super(key: key);
 
   @override
-  State<MyFarm> createState() => _MyFarmState();
+  State<FarmDetails> createState() => _FarmDetailsState();
 }
 
-class _MyFarmState extends State<MyFarm> {
+class _FarmDetailsState extends State<FarmDetails> {
   final List HotelImg = [
     'assets/image/bath.jpg',
     'assets/image/dinner.jpg',
@@ -39,8 +24,8 @@ class _MyFarmState extends State<MyFarm> {
     'assets/image/pool.jpg',
     'assets/image/room.jpg',
   ];
-  int i = -1;
-  FirebaseFirestore storage = FirebaseFirestore.instance;
+  bool ShowText = false;
+  PropertyModel propertyModel = PropertyModel();
 
   @override
   void initState() {
@@ -48,183 +33,134 @@ class _MyFarmState extends State<MyFarm> {
     super.initState();
   }
 
-  late PropertyModel propertyModel;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        iconTheme: IconThemeData(color: Colors.black),
-        backgroundColor: Colors.transparent,
-        elevation: 0.0,
-        titleSpacing: 0,
-        centerTitle: true,
-        title: Text(
-          "My Farm",
-          style: TextStyle(fontFamily: 'NotoSans-Medium', color: Colors.black),
+        appBar: AppBar(
+          iconTheme: IconThemeData(color: Colors.black),
+          backgroundColor: Colors.transparent,
+          elevation: 0.0,
+          titleSpacing: 0,
+          centerTitle: true,
+          title: Text(
+            "Farm History Details",
+            style:
+                TextStyle(fontFamily: 'NotoSans-Medium', color: Colors.black),
+          ),
         ),
-      ),
-      body: SingleChildScrollView(
-        child: Container(
-          margin: EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              CarouselSlider(
-                options: CarouselOptions(
-                  height: 180,
-                  disableCenter: true,
-                  autoPlay: true,
+        body: SingleChildScrollView(
+          child: Container(
+            margin: EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                CarouselSlider(
+                  options: CarouselOptions(
+                    height: 180,
+                    disableCenter: true,
+                    autoPlay: true,
+                  ),
+                  items: HotelImg.map((e) {
+                    return Container(
+                      margin: EdgeInsets.all(10),
+                      child: ClipRRect(
+                          borderRadius: BorderRadius.all(Radius.circular(15)),
+                          child: Image.asset(e, fit: BoxFit.fill)),
+                    );
+                  }).toList(),
                 ),
-                items: HotelImg.map((e) {
-                  return Container(
-                    margin: EdgeInsets.all(10),
-                    child: ClipRRect(
-                        borderRadius: BorderRadius.all(Radius.circular(15)),
-                        child: Image.asset(e, fit: BoxFit.fill)),
-                  );
-                }).toList(),
-              ),
-              heightSpace(5),
-              thinAppDevider(),
-              heightSpace(5),
-              Text("Address",
-                  style: TextStyle(fontFamily: 'NotoSans-Bold', fontSize: 16)),
-              SizedBox(width: 3),
-              Text("${propertyModel.PropertyAddress}",
-                  maxLines: ShowText ? 8 : 1, style: normalStyle),
-              InkWell(
-                onTap: () {
-                  setState(() {
-                    ShowText = !ShowText;
-                  });
-                },
-                child: Row(children: [
-                  ShowText
-                      ? Text(
-                          "less",
-                          style: TextStyle(color: rPrimarycolor),
-                        )
-                      : Text("read more",
-                          style: TextStyle(color: rPrimarycolor))
-                ]),
-              ),
-              heightSpace(20),
-              if (propertyModel.PropertyType == 'Villa') Villa_Details(),
-              if (propertyModel.PropertyType == 'Cottage') Cottage_Details(),
-              if (propertyModel.PropertyType == 'Tent') Tent_Details(),
-              if (propertyModel.PropertyType == 'Farm House')
-                FarmHouse_Details(),
-              SizedBox(height: 20),
-              Text("Rent & Fees",
-                  style: TextStyle(fontSize: 16, fontFamily: 'NotoSans-Bold')),
-              heightSpace(5),
-              if (propertyModel.PropertyType == 'Villa' ||
-                  propertyModel.PropertyType == 'Cottage' ||
-                  propertyModel.PropertyType == 'Farm House')
-                RentAndFees(),
-              if (propertyModel.PropertyType == 'Tent') Tent_RentAndFees(),
-              heightSpace(10),
-              Text("Features",
-                  style: TextStyle(fontSize: 16, fontFamily: 'NotoSans-Bold')),
-              heightSpace(5),
-              Text("Amenities",
-                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
-              if (propertyModel.PropertyType == 'Villa') Villa_Amenities(),
-              if (propertyModel.PropertyType == 'Tent') Tent_Amenities(),
-              if (propertyModel.PropertyType == 'Cottage') Cottage_Amenities(),
-              if (propertyModel.PropertyType == 'Farm House') Farm_Amenities(),
-              heightSpace(10),
-              Text("Facilities",
-                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
-              if (propertyModel.PropertyType == 'Villa') Facilities(),
-              if (propertyModel.PropertyType == 'Tent') Tent_Facilities(),
-              if (propertyModel.PropertyType == 'Cottage') Cottage_Facilities(),
-              if (propertyModel.PropertyType == 'Farm House') Farm_Facilities(),
-              heightSpace(10),
-              Text("Guidelines & Rules",
-                  style: TextStyle(fontSize: 16, fontFamily: 'NotoSans-Bold')),
-              heightSpace(5),
-              if (propertyModel.PropertyType == 'Villa') Villa_Guidelines(),
-              if (propertyModel.PropertyType == 'Tent') Tent_Guidelines(),
-              if (propertyModel.PropertyType == 'Cottage') Cottage_Guidelines(),
-              if (propertyModel.PropertyType == 'Farm House') Farm_Guidelines(),
-              heightSpace(10),
-              Text("Terms & Condition",
-                  style: TextStyle(fontSize: 16, fontFamily: 'NotoSans-Bold')),
-              heightSpace(5),
-              Terms_condition(),
-              heightSpace(10),
-              Text("Canclellation Policy",
-                  style: TextStyle(fontSize: 16, fontFamily: 'NotoSans-Bold')),
-              heightSpace(5),
-              CancleFarm(),
-              SizedBox(height: 15),
-              Center(
-                child: BouncingWidget(
-                    child: Container(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 100, vertical: 15),
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(25),
-                          color: Colors.teal.shade300),
-                      child: Text("Direction", style: buttonStyle),
-                    ),
-                    onPressed: () {
-                      pushNewScreen(
-                        context,
-                        screen: GMap(),
-                        withNavBar: false,
-                        pageTransitionAnimation:
-                            PageTransitionAnimation.cupertino,
-                      );
-                    }),
-              ),
-            ],
+                heightSpace(5),
+                thinAppDevider(),
+                heightSpace(5),
+                Text("Address",
+                    style:
+                        TextStyle(fontFamily: 'NotoSans-Bold', fontSize: 16)),
+                SizedBox(width: 3),
+                Text("${propertyModel.PropertyAddress}",
+                    maxLines: ShowText ? 8 : 1, style: normalStyle),
+                InkWell(
+                  onTap: () {
+                    setState(() {
+                      ShowText = !ShowText;
+                    });
+                  },
+                  child: Row(children: [
+                    ShowText
+                        ? Text(
+                            "less",
+                            style: TextStyle(color: rPrimarycolor),
+                          )
+                        : Text("read more",
+                            style: TextStyle(color: rPrimarycolor))
+                  ]),
+                ),
+                heightSpace(20),
+                //if (propertyModel.PropertyType == 'Villa') Villa_Details(),
+                if (propertyModel.PropertyType == 'Cottage') Cottage_Details(),
+                if (propertyModel.PropertyType == 'Tent') Tent_Details(),
+                if (propertyModel.PropertyType == 'Farm House')
+                  FarmHouse_Details(),
+                SizedBox(height: 20),
+                Text("Rent & Fees",
+                    style:
+                        TextStyle(fontSize: 16, fontFamily: 'NotoSans-Bold')),
+                heightSpace(5),
+                if (propertyModel.PropertyType == 'Villa' ||
+                    propertyModel.PropertyType == 'Cottage' ||
+                    propertyModel.PropertyType == 'Farm House')
+                  RentAndFees(),
+                if (propertyModel.PropertyType == 'Tent') Tent_RentAndFees(),
+                heightSpace(10),
+                Text("Features",
+                    style:
+                        TextStyle(fontSize: 16, fontFamily: 'NotoSans-Bold')),
+                heightSpace(5),
+                Text("Amenities",
+                    style:
+                        TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+                if (propertyModel.PropertyType == 'Villa') Villa_Amenities(),
+                if (propertyModel.PropertyType == 'Tent') Tent_Amenities(),
+                if (propertyModel.PropertyType == 'Cottage')
+                  Cottage_Amenities(),
+                if (propertyModel.PropertyType == 'Farm House')
+                  Farm_Amenities(),
+                heightSpace(10),
+                Text("Facilities",
+                    style:
+                        TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+                // if (propertyModel.PropertyType == 'Villa') Facilities(),
+                if (propertyModel.PropertyType == 'Tent') Tent_Facilities(),
+                if (propertyModel.PropertyType == 'Cottage')
+                  Cottage_Facilities(),
+                if (propertyModel.PropertyType == 'Farm House')
+                  Farm_Facilities(),
+                heightSpace(10),
+                Text("Guidelines & Rules",
+                    style:
+                        TextStyle(fontSize: 16, fontFamily: 'NotoSans-Bold')),
+                heightSpace(5),
+                if (propertyModel.PropertyType == 'Villa') Villa_Guidelines(),
+                if (propertyModel.PropertyType == 'Tent') Tent_Guidelines(),
+                if (propertyModel.PropertyType == 'Cottage')
+                  Cottage_Guidelines(),
+                if (propertyModel.PropertyType == 'Farm House')
+                  Farm_Guidelines(),
+                heightSpace(10),
+                Text("Terms & Condition",
+                    style:
+                        TextStyle(fontSize: 16, fontFamily: 'NotoSans-Bold')),
+                heightSpace(5),
+                Terms_condition(),
+                heightSpace(10),
+                Text("Canclellation Policy",
+                    style:
+                        TextStyle(fontSize: 16, fontFamily: 'NotoSans-Bold')),
+                heightSpace(5),
+                CancleFarm(),
+              ],
+            ),
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget Villa_Details() {
-    return Row(
-      children: [
-        Expanded(
-          child: Column(
-            children: [
-              Icon(Icons.home, size: 30),
-              Text("Type"),
-              Text("${propertyModel.PropertyType}", style: normalStyle),
-              heightSpace(10),
-              Icon(Icons.bed, size: 30),
-              Text("Bedrooms"),
-              Text("${propertyModel.NumberOfBed}", style: normalStyle),
-            ],
-          ),
-        ),
-        Expanded(
-            child: Column(
-          children: [
-            FaIcon(FontAwesomeIcons.arrows),
-            Text("Farm size"),
-            Text("${propertyModel.PropertySize}", style: normalStyle),
-          ],
-        )),
-        Expanded(
-            child: Column(
-          children: [
-            Icon(Icons.person, size: 30),
-            Text("Guest Capacity"),
-            Text("${propertyModel.GuestCapacity}", style: normalStyle),
-            heightSpace(10),
-            FaIcon(FontAwesomeIcons.personSwimming),
-            Text("Swimming pool"),
-            Text("${propertyModel.SwimmingPool}", style: normalStyle),
-          ],
-        )),
-      ],
-    );
+        ));
   }
 
   Widget FarmHouse_Details() {

@@ -329,6 +329,7 @@ class _AddFarmState extends State<AddFarm> {
   final _auth = FirebaseAuth.instance;
   FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
   void AddFarmDetaistoFirestore() async {
+    String? docid = firebaseFirestore.collection('Property').doc().id;
     User? addfarm = _auth.currentUser;
     PropertyModel addFarmModel = PropertyModel();
     addFarmModel.OwnerId = addfarm!.uid;
@@ -354,8 +355,12 @@ class _AddFarmState extends State<AddFarm> {
     addFarmModel.Facilities = Farm_Facilities_data;
     addFarmModel.Amenities = Farm_Amenities_data;
     addFarmModel.Terms_and_Ruls = Farm_Terms_and_Ruls;
+    addFarmModel.documentid = docid;
 
-    await firebaseFirestore.collection('Property').add(addFarmModel.toMap());
+    await firebaseFirestore
+        .collection('Property')
+        .doc(docid)
+        .set(addFarmModel.toMap());
 
     Fluttertoast.showToast(msg: "Add farm sucessfully :) ");
   }
@@ -363,6 +368,7 @@ class _AddFarmState extends State<AddFarm> {
   void AddVillaDetaistoFirestore() async {
     User? addvilla = _auth.currentUser;
     PropertyModel addVillaModel = PropertyModel();
+    String? docid = firebaseFirestore.collection('Property').doc().id;
     addVillaModel.OwnerId = addvilla!.uid;
     addVillaModel.Name = name_control.text;
     addVillaModel.PhoneNumber = mobile_control.text;
@@ -385,13 +391,18 @@ class _AddFarmState extends State<AddFarm> {
     addVillaModel.Facilities = Villa_Facilities;
     addVillaModel.Amenities = Villa_Amenities;
     addVillaModel.Terms_and_Ruls = Villa_Terms_and_Ruls;
+    addVillaModel.documentid = docid;
 
-    await firebaseFirestore.collection('Property').add(addVillaModel.toMap());
+    await firebaseFirestore
+        .collection('Property')
+        .doc(docid)
+        .set(addVillaModel.toMap());
 
     Fluttertoast.showToast(msg: "Add Villa Sucessfully :) ");
   }
 
   void AddCottageDetaistoFirestore() async {
+    String? docid = firebaseFirestore.collection('Property').doc().id;
     User? addcottage = _auth.currentUser;
     PropertyModel addCottageModel = PropertyModel();
     addCottageModel.OwnerId = addcottage!.uid;
@@ -416,8 +427,12 @@ class _AddFarmState extends State<AddFarm> {
     addCottageModel.Facilities = Cottage_Facilities;
     addCottageModel.Amenities = Cottage_Amenities;
     addCottageModel.Terms_and_Ruls = Cottage_Terms_and_Ruls;
+    addCottageModel.documentid = docid;
 
-    await firebaseFirestore.collection('Property').add(addCottageModel.toMap());
+    await firebaseFirestore
+        .collection('Property')
+        .doc(docid)
+        .set(addCottageModel.toMap());
 
     Fluttertoast.showToast(msg: "Add Cottage sucessfully :) ");
   }
@@ -448,7 +463,7 @@ class _AddFarmState extends State<AddFarm> {
   void AddTentDetaistoFirestore() async {
     User? addtent = _auth.currentUser;
     PropertyModel addTentmodel = PropertyModel();
-
+    String? docid = firebaseFirestore.collection('Property').doc().id;
     addTentmodel.OwnerId = addtent!.uid;
     addTentmodel.Name = name_control.text;
     addTentmodel.PhoneNumber = mobile_control.text;
@@ -465,10 +480,13 @@ class _AddFarmState extends State<AddFarm> {
     addTentmodel.Facilities = Tent_Facilities;
     addTentmodel.Amenities = Tent_Amenities;
     addTentmodel.Terms_and_Ruls = Tent_Terms_and_Ruls;
-
     addTentmodel.PropertyImage = imageurls;
+    addTentmodel.documentid = docid;
 
-    await firebaseFirestore.collection('Property').add(addTentmodel.toMap());
+    await firebaseFirestore
+        .collection('Property')
+        .doc(docid)
+        .set(addTentmodel.toMap());
 
     Fluttertoast.showToast(msg: "Add Tent Sucessfully :) ");
   }

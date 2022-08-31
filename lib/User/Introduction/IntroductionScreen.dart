@@ -24,6 +24,7 @@ class _introductionSliderState extends State<introductionSlider> {
 
     slides.add(
       Slide(
+        
           title: "Plan Your Trips",
           styleTitle: const TextStyle(
             color: Colors.black,

@@ -38,7 +38,6 @@ dependencies:
   checkbox_grouped: ^1.8.1
   firebase_storage: ^10.3.5
   file_picker: ^5.0.1
-  ck_utils: ^1.0.1
 
 
 

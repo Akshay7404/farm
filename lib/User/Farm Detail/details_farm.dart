@@ -1,5 +1,7 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
+import 'dart:ffi';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:blurrycontainer/blurrycontainer.dart';
 import 'package:bouncing_widget/bouncing_widget.dart';
@@ -48,7 +50,7 @@ class _details_farmState extends State<details_farm> {
     super.initState();
     property = widget.propertyModel;
     DiscountPrice = widget.Dis;
-    
+
     _controller = ScrollController()
       ..addListener(() {
         _listener();
@@ -91,6 +93,7 @@ class _details_farmState extends State<details_farm> {
 
   User? user = FirebaseAuth.instance.currentUser;
   Usermodel usermodel = Usermodel();
+  
 
   @override
   Widget build(BuildContext context) {
@@ -115,8 +118,7 @@ class _details_farmState extends State<details_farm> {
                     ),
                     actions: [
                       CircleAvatar(
-                          maxRadius: 25,
-                          backgroundColor: Colors.white,
+                          maxRadius: 25,       backgroundColor: Colors.white,
                           child: LikeButton(
                             padding: EdgeInsets.only(left: 9, top: 7),
                             likeBuilder: (bool isLiked) {
@@ -125,6 +127,7 @@ class _details_farmState extends State<details_farm> {
                                 color: isLiked ? rPrimarycolor : Colors.grey,
                               );
                             },
+                           
                           )),
                       widthSpace(9)
                     ],
@@ -232,11 +235,13 @@ class _details_farmState extends State<details_farm> {
                           onPressed: () {
                             Navigator.of(context).push(MaterialPageRoute(
                               builder: (context) => farmBooking(
-                                property: property, Dis: DiscountPrice!,
+                                property: property,
+                                Dis: DiscountPrice!,
                               ),
                             ));
                           }),
                     ),
+                 
                   ],
                 ),
               ),

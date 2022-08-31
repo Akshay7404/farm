@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
 import 'package:flutter/material.dart';
+import 'package:resortbooking/Model/PayonFarm.dart';
 import 'package:resortbooking/User/Common/Color.dart';
 import 'package:resortbooking/User/Common/Constant.dart';
 import 'package:resortbooking/User/Common/Navigators.dart';
@@ -8,6 +9,8 @@ import 'package:resortbooking/User/Common/Style.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:resortbooking/User/Farm%20Detail/details.dart';
 import 'package:resortbooking/User/google%20map/GoogleMap.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class BookingHistory extends StatefulWidget {
   const BookingHistory({Key? key}) : super(key: key);
@@ -17,6 +20,8 @@ class BookingHistory extends StatefulWidget {
 }
 
 class _BookingHistoryState extends State<BookingHistory> {
+  User? user = FirebaseAuth.instance.currentUser;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -31,122 +36,136 @@ class _BookingHistoryState extends State<BookingHistory> {
           style: TextStyle(fontFamily: 'NotoSans-Medium', color: Colors.black),
         ),
       ),
-      body: Container(
-        margin: EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              padding: EdgeInsets.all(10),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
+      body: StreamBuilder(
+        stream: FirebaseFirestore.instance
+            .collection('Payment')
+            .where('Uid', isEqualTo: user!.uid)
+            .snapshots(),
+        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+          if (!snapshot.hasData) {
+            return Center(child: CircularProgressIndicator());
+          }
+          return ListView(
+              padding: EdgeInsets.zero,
+              shrinkWrap: true,
+              children: snapshot.data!.docs.map((document) {
+                PaymentProoerty paymentProoerty = PaymentProoerty.fromMap(
+                    document.data() as Map<String, dynamic>);
+
+                return Container(
+                  margin: EdgeInsets.only(left: 15, right: 15),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Container(
-                        height: 80,
-                        width: 80,
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(10),
-                          child: Image.asset('assets/image/hotel.jpg',
-                              fit: BoxFit.fill),
-                        ),
-                      ),
-                      Container(
-                        margin: EdgeInsets.only(top: 10, left: 10, right: 10),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text("Grand Royal Hotel",
-                                style: TextStyle(
-                                  fontFamily: 'NotoSans-Bold',
-                                )),
-                            Text("29-07-2022 to 30-07-2022",
-                                style: TextStyle(
-                                    fontFamily: 'NotoSans-Medium',
-                                    color: rGrey,
-                                    fontSize: 13)),
-                            Text("Wembly, London 2.0 k to city",
-                                style: TextStyle(
-                                    fontFamily: 'NotoSans-Medium',
-                                    fontSize: 13)),
-                            SizedBox(height: 20),
+                            Row(
+                              children: [
+                                Container(
+                                  height: 80,
+                                  width: 80,
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: Image.asset('assets/image/hotel.jpg',
+                                        fit: BoxFit.fill),
+                                  ),
+                                ),
+                                Flexible(
+                                  child: Container(
+                                    margin: EdgeInsets.only(
+                                        top: 10, left: 10, right: 10),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(document['PropertyName'],
+                                            style: TextStyle(
+                                              fontFamily: 'NotoSans-Bold',
+                                            )),
+                                        Text(document['selectdate'],
+                                            style: TextStyle(
+                                                fontFamily: 'NotoSans-Medium',
+                                                color: rGrey,
+                                                fontSize: 13)),
+                                        Text(document['PropertyAddress'],
+                                            style: TextStyle(
+                                                fontFamily: 'NotoSans-Medium',
+                                                fontSize: 13,
+                                                overflow:
+                                                    TextOverflow.ellipsis)),
+                                        SizedBox(height: 20),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            heightSpace(10),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      primary: rPrimarycolor,
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(15)),
+                                    ),
+                                    onPressed: () {},
+                                    child: Row(
+                                      children: [
+                                        Icon(Icons.directions),
+                                        widthSpace(3),
+                                        Text("Direction")
+                                      ],
+                                    )),
+                                ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      primary: rPrimarycolor,
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(15)),
+                                    ),
+                                    onPressed: () {},
+                                    child: Row(
+                                      children: [
+                                        Icon(Icons.call),
+                                        widthSpace(3),
+                                        Text("Call Hotel")
+                                      ],
+                                    )),
+                              ],
+                            ),
+                            Row(children: [
+                              Text("Total amount", style: normalStyle),
+                              Spacer(),
+                              Text("₹" + document['total']),
+                              IconButton(
+                                  onPressed: () {
+                                    showModalBottomSheet(
+                                        context: context,
+                                        builder: (BuildContext context) =>
+                                            Total(document));
+                                  },
+                                  icon: Icon(Icons.arrow_forward_ios_outlined,
+                                      size: 18))
+                            ])
                           ],
                         ),
                       ),
+                      Divider()
                     ],
                   ),
-                  heightSpace(15),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Column(
-                        children: [
-                          SizedBox.fromSize(
-                            size: Size(50, 50),
-                            child: ClipOval(
-                              child: Material(
-                                  color: Colors.grey.shade300,
-                                  child: InkWell(
-                                    onTap: () =>
-                                        pushScreen(context, () => GMap()),
-                                    child: Center(
-                                      child: FaIcon(
-                                          FontAwesomeIcons.locationArrow),
-                                    ),
-                                  )),
-                            ),
-                          ),
-                          heightSpace(5),
-                          Text("Direction", style: TextStyle(fontSize: 14)),
-                        ],
-                      ),
-                      widthSpace(40),
-                      Column(
-                        children: [
-                          SizedBox.fromSize(
-                            size: Size(50, 50),
-                            child: ClipOval(
-                              child: Material(
-                                  color: Colors.grey.shade300,
-                                  child: InkWell(
-                                    onTap: CallHotel,
-                                    child: Center(
-                                      child: FaIcon(FontAwesomeIcons.phone),
-                                    ),
-                                  )),
-                            ),
-                          ),
-                          heightSpace(5),
-                          Text("Call hotel", style: TextStyle(fontSize: 14)),
-                        ],
-                      ),
-                    ],
-                  ),
-                  heightSpace(20),
-                  Row(children: [
-                    Text("Total amount", style: normalStyle),
-                    Spacer(),
-                    Text("\$170"),
-                    IconButton(
-                        onPressed: () {
-                          showModalBottomSheet(
-                              context: context,
-                              builder: (BuildContext context) => Total());
-                        },
-                        icon: Icon(Icons.arrow_forward_ios_outlined, size: 18))
-                  ])
-                ],
-              ),
-            ),
-            Divider()
-          ],
-        ),
+                );
+              }).toList());
+        },
       ),
     );
   }
 
-  Widget Total() {
+  Widget Total(QueryDocumentSnapshot<Object?> document) {
     return Container(
       height: MediaQuery.of(context).size.height * 0.15,
       margin: EdgeInsets.all(15),
@@ -159,14 +178,16 @@ class _BookingHistoryState extends State<BookingHistory> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text("Subtotal", style: TextStyle(fontFamily: 'NotoSans-Medium')),
-              Text("\$180", style: TextStyle(fontFamily: 'NotoSans-Bold')),
+              Text("₹" + document['subtotal'],
+                  style: TextStyle(fontFamily: 'NotoSans-Bold')),
             ],
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text("Discount", style: TextStyle(fontFamily: 'NotoSans-Medium')),
-              Text("- \$10", style: TextStyle(fontFamily: 'NotoSans-Bold')),
+              Text("-₹" + document['Discount'],
+                  style: TextStyle(fontFamily: 'NotoSans-Bold')),
             ],
           ),
           thinAppDevider(),
@@ -174,7 +195,8 @@ class _BookingHistoryState extends State<BookingHistory> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text("Total", style: TextStyle(fontFamily: 'NotoSans-Medium')),
-              Text("\$170", style: TextStyle(fontFamily: 'NotoSans-Bold')),
+              Text("₹" + document['total'],
+                  style: TextStyle(fontFamily: 'NotoSans-Bold')),
             ],
           ),
         ],

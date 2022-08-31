@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_constructors
+// ignore_for_file: prefer_const_constructors, avoid_single_cascade_in_expression_statements
 
 import 'package:flutter/material.dart';
 import 'package:bouncing_widget/bouncing_widget.dart';
@@ -17,7 +17,19 @@ import 'package:fluttertoast/fluttertoast.dart';
 
 class CreditDebit_Card extends StatefulWidget {
   final String date;
-  const CreditDebit_Card({Key? key, required this.date}) : super(key: key);
+  final PropertyModel propertyModel;
+  final disprise;
+  final subtotal;
+  final total;
+
+  const CreditDebit_Card({
+    Key? key,
+    required this.date,
+    required this.propertyModel,
+    this.disprise,
+    this.subtotal,
+    this.total,
+  }) : super(key: key);
 
   @override
   State<CreditDebit_Card> createState() => _CreditDebit_CardState();
@@ -33,13 +45,23 @@ class _CreditDebit_CardState extends State<CreditDebit_Card> {
   void initState() {
     ExpDateController.text = "";
     selectdate = widget.date;
+    property = widget.propertyModel;
+    disamt = widget.disprise;
+    subtotal = widget.subtotal;
+    total = widget.total;
+
     super.initState();
   }
 
+  var disamt;
+  var subtotal;
+  var total;
+  PropertyModel property = PropertyModel();
   User? user = FirebaseAuth.instance.currentUser;
   String? selectdate;
   bool Check = false;
   final _form = GlobalKey<FormState>();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -206,6 +228,7 @@ class _CreditDebit_CardState extends State<CreditDebit_Card> {
                   onPressed: () {
                     if (_form.currentState!.validate() && Check == true) {
                       AddCredit_DebitonFirestore();
+
                       pushScreen(context, () => thankYouScreen());
                     } else {
                       showToast(text: "Please check Acknowledgement");
@@ -222,7 +245,7 @@ class _CreditDebit_CardState extends State<CreditDebit_Card> {
                               style: buttonStyle))),
                 ),
                 heightSpace(20),
-                Text("${selectdate}")
+                Text("${selectdate}"),
               ],
             ),
           ),
@@ -232,6 +255,7 @@ class _CreditDebit_CardState extends State<CreditDebit_Card> {
   }
 
   String payment = "Credit card/Debit card";
+
   void AddCredit_DebitonFirestore() async {
     await FirebaseFirestore.instance
         .collection('users')
@@ -240,32 +264,27 @@ class _CreditDebit_CardState extends State<CreditDebit_Card> {
         .then((value) {
       Usermodel model = Usermodel.fromMap(value.data() as Map<String, dynamic>);
 
+      PaymentProoerty AddCreditDebit = PaymentProoerty(
+          PaymentMethod: payment,
+          selectdate: selectdate,
+          Email: model.UserEmail,
+          Name: model.UserFName,
+          PhoneNumber: model.PhoneNumber,
+          PropertyAddress: property.PropertyAddress,
+          PropertyName: property.PropertyName,
+          PropertyPhone: property.PhoneNumber,
+          subtotal: subtotal.toString(),
+          Discount: disamt.toString(),
+          total: total.toString(),
+          PropertyId: property.OwnerId,
+          Uid: model.UserId,
+          profileUrl: model.ProfilePic);
+
       FirebaseFirestore.instance
-          .collection('Property')
-          .doc(user!.uid)
-          .get()
-          .then((value) {
-        PropertyModel propertyModel =
-            PropertyModel.fromMap(value.data() as Map<String, dynamic>);
+          .collection('Payment')
+          .add(AddCreditDebit.toMap());
 
-        PaymentProoerty AddCreditDebit = PaymentProoerty(
-            PaymentMethod: payment,
-            selectdate: selectdate,
-            Email: model.UserEmail,
-            Name: model.UserFName,
-            PhoneNumber: model.PhoneNumber,
-            PropertyName: propertyModel.PropertyName,
-            PropertyAddress: propertyModel.PropertyAddress,
-            PropertyPhone: propertyModel.PhoneNumber);
-
-        FirebaseFirestore.instance
-            .collection('users')
-            .doc(user!.uid)
-            .collection('Payment')
-            .add(AddCreditDebit.toMap());
-
-        Fluttertoast.showToast(msg: "Payment Successfully :) ");
-      });
+      Fluttertoast.showToast(msg: "Payment Successfully :) ");
     });
   }
 }

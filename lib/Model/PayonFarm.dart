@@ -1,5 +1,3 @@
-import 'package:resortbooking/Model/user_model.dart';
-
 class PaymentProoerty {
   String? Name;
   String? Email;
@@ -9,6 +7,12 @@ class PaymentProoerty {
   String? PropertyName;
   String? PropertyAddress;
   String? PropertyPhone;
+  String? subtotal;
+  String? Discount;
+  String? total;
+  String? PropertyId;
+  String? Uid;
+  String? profileUrl;
 
   PaymentProoerty(
       {this.Name,
@@ -18,7 +22,13 @@ class PaymentProoerty {
       this.PaymentMethod,
       this.PropertyName,
       this.PropertyAddress,
-      this.PropertyPhone});
+      this.PropertyPhone,
+      this.subtotal,
+      this.Discount,
+      this.total,
+      this.PropertyId,
+      this.Uid,
+      this.profileUrl});
 
   factory PaymentProoerty.fromMap(Map<String, dynamic> map) {
     return PaymentProoerty(
@@ -29,8 +39,15 @@ class PaymentProoerty {
         PaymentMethod: map['PaymentMethod'],
         PropertyName: map['PropertyName'],
         PropertyAddress: map['PropertyAddress'],
-        PropertyPhone: map['PropertyPhone']);
+        PropertyPhone: map['PropertyPhone'],
+        subtotal: map['subtotal'],
+        Discount: map['Discount'],
+        total: map['total'],
+        PropertyId: map['PropertyId'],
+        Uid: map['Uid'],
+        profileUrl: map['profileUrl']);
   }
+
   Map<String, dynamic> toMap() {
     return {
       'Name': Name,
@@ -40,7 +57,13 @@ class PaymentProoerty {
       'PaymentMethod': PaymentMethod,
       'PropertyName': PropertyName,
       'PropertyAddress': PropertyAddress,
-      'PropertyPhone': PropertyPhone
+      'PropertyPhone': PropertyPhone,
+      'subtotal': subtotal,
+      'Discount': Discount,
+      'total': total,
+      'PropertyId': PropertyId,
+      'Uid': Uid,
+      'profileUrl': profileUrl
     };
   }
 }

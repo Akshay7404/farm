@@ -195,6 +195,37 @@ Widget Villa() {
           ),
         ),
         heightSpace(20),
+        Text("Villa Discount", style: normalStyle),
+        heightSpace(8),
+        SimpleGroupedChips(
+          controller: controller,
+          values: ['yes', 'no'],
+          itemTitle: ['yes', 'no'],
+          chipGroupStyle: ChipGroupStyle.minimize(
+            backgroundColorItem: Colors.grey.shade400,
+            selectedColorItem: rPrimarycolor,
+            itemTitleStyle: TextStyle(fontSize: 14),
+          ),
+          onItemSelected: ((selected) {
+            VillaDiscount = selected;
+
+            if (VillaDiscount == 'yes') {
+              setState(
+                () {
+                  Villadiscountvisible = true;
+                  DiscountVilla();
+                },
+              );
+            } else {
+              setState(() {
+                Villadiscountvisible = false;
+              });
+            }
+          }),
+        ),
+        heightSpace(7),
+        DiscountVilla(),
+        heightSpace(20),
         Text("Facilities & Amenities",
             style: TextStyle(fontFamily: 'NotoSans-Medium', fontSize: 18)),
         heightSpace(15),
@@ -336,6 +367,7 @@ Widget Villa() {
   );
 }
 
+String? VillaDiscount;
 final Villa_guestCapacity = TextEditingController();
 final Villa_numberofbed = TextEditingController();
 final Villa_numberofbath = TextEditingController();
@@ -345,6 +377,7 @@ final Villa_size = TextEditingController();
 final Villa_RentWeekdays = TextEditingController();
 final Villa_RentWeekends = TextEditingController();
 String? villaadditionalguest;
+final Villa_Discount = TextEditingController();
 final Villa_AdditionalGuestCharge = TextEditingController();
 final Villa_CleaningFees = TextEditingController();
 final Villa_SecurityDeposit = TextEditingController();
@@ -390,4 +423,36 @@ Widget VillaAdditionalGuestsCharge() {
       : SizedBox();
 }
 
+Widget DiscountVilla() {
+  return Villadiscountvisible
+      ? Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text("Villa Discount", style: normalStyle),
+            heightSpace(8),
+            Container(
+              decoration: BoxDecoration(boxShadow: [
+                BoxShadow(
+                    color: Colors.black12,
+                    blurRadius: 20,
+                    offset: Offset(5, 5)),
+              ]),
+              child: appTextField(
+                textEditingController: Villa_Discount,
+                hintText: "Villa Discount",
+                keyboardType: TextInputType.phone,
+                validation: (value) {
+                  if (value!.isEmpty) {
+                    return 'Enter Villa Discount';
+                  }
+                },
+              ),
+            ),
+            heightSpace(20),
+          ],
+        )
+      : SizedBox();
+}
+
 bool Villavisible = false;
+bool Villadiscountvisible = false;
