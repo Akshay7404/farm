@@ -1,6 +1,8 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'dart:developer';
+import 'package:firebase_admin/firebase_admin.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:resortbooking/Model/user_model.dart';
 import 'package:resortbooking/User/Common/Color.dart';
@@ -9,6 +11,7 @@ import 'package:resortbooking/User/Common/Style.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 Widget DeleteUser(Usermodel usermodel) {
   return StatefulBuilder(
@@ -38,7 +41,7 @@ Widget DeleteUser(Usermodel usermodel) {
                       Container(
                           margin: EdgeInsets.all(10),
                           child: Text(
-                              "You want to Delete ${usermodel.UserFName}${usermodel.UserLName}")),
+                              "You want to Delete ${usermodel.UserFName} ${usermodel.UserLName}")),
                       thinAppDevider(),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -53,7 +56,13 @@ Widget DeleteUser(Usermodel usermodel) {
                           Container(width: 1, height: 28, color: rGrey),
                           TextButton(
                               onPressed: () {
-                              
+                                print(usermodel.UserId);
+                                FirebaseFirestore.instance
+                                    .collection('users')
+                                    .doc(usermodel.UserId)
+                                    .delete();
+
+                                Navigator.pop(context);
                               },
                               child: Text("Yes",
                                   style: TextStyle(color: Colors.green)))
@@ -76,4 +85,4 @@ Widget DeleteUser(Usermodel usermodel) {
   );
 }
 
-
+final storage = FlutterSecureStorage();

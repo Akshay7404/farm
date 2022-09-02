@@ -426,7 +426,6 @@ class _EditProfileState extends State<EditProfile> {
 
     await firebaseFirestore.collection('users').doc(user.uid).update({
       'UserFName': FirstNameController.text,
-        
       'UserEMail': EmailController.text,
       'PhoneNumber': PhoneNumberController.text,
       'ProfilePic': imageUrl,

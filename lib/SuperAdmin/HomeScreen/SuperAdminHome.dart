@@ -1,6 +1,9 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:resortbooking/Model/user_model.dart';
 import 'package:resortbooking/SuperAdmin/Farm%20Owner%20Panel/FarmOwnerPanel.dart';
 import 'package:resortbooking/SuperAdmin/HomeScreen/LogOut.dart';
 import 'package:resortbooking/SuperAdmin/Setting/Setting.dart';
@@ -35,55 +38,83 @@ class _SuperAdminHomeState extends State<SuperAdminHome> {
         ),
         drawer: Drawer(
             width: MediaQuery.of(context).size.width * 0.7,
-            child: ListView(
-              children: [
-                DrawerHeader(
-                    decoration: BoxDecoration(color: rPrimarycolor),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          height: 90,
-                          width: 90,
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(150),
-                              boxShadow: [
-                                BoxShadow(
-                                    color: Colors.black12,
-                                    blurRadius: 5,
-                                    offset: const Offset(5, 5)),
-                              ]),
-                          child: ClipOval(
-                              child: Image.asset("assets/image/person.jpg",
-                                  fit: BoxFit.fill)),
-                        ),
-                        heightSpace(5),
-                        Text(
-                          "Admin@gmail.com",
-                          style: TextStyle(
-                              fontSize: 24,
-                              fontFamily: 'NotoSans-Medium',
-                              color: Colors.white),
-                        ),
-                      ],
-                    )),
-                Button("User", Icons.person, () {
-                  setState(() {
-                    main = UserPanel();
-                    Navigator.pop(context);
-                  });
-                }),
-                Button("Farm Owner", Icons.home, () {
-                  setState(() {
-                    main = FarmOwnerPanel();
-                    Navigator.pop(context);
-                  });
-                }),
-                Button("Setting", Icons.settings, () {
-                  pushScreen(context, () => Setting());
-                }),
-                LogOutSuperAdmin()
-              ],
+            child: StreamBuilder(
+              stream: FirebaseFirestore.instance
+                  .collection('users')
+                  .where('UserId',
+                      isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+                  .snapshots(),
+              builder: (BuildContext context,
+                  AsyncSnapshot<QuerySnapshot> snapshot) {
+                if (!snapshot.hasData) {
+                  return Center(child: CircularProgressIndicator());
+                }
+                return ListView(
+                    padding: EdgeInsets.zero,
+                    children: snapshot.data!.docs.map(
+                      (document) {
+                        Usermodel model = Usermodel.fromMap(
+                            document.data() as Map<String, dynamic>);
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: 280,
+                              decoration: BoxDecoration(color: rPrimarycolor),
+                              child: DrawerHeader(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Container(
+                                      height: 100,
+                                      width: 90,
+                                      decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(150),
+                                          boxShadow: [
+                                            BoxShadow(
+                                                color: Colors.black12,
+                                                blurRadius: 5,
+                                                offset: const Offset(5, 5)),
+                                          ]),
+                                      child: ClipOval(
+                                          child: Image.network(
+                                              "${model.ProfilePic}",
+                                              fit: BoxFit.fill)),
+                                    ),
+                                    heightSpace(5),
+                                    Text(
+                                      "${model.UserEmail}",
+                                      style: TextStyle(
+                                          fontSize: 20,
+                                          fontFamily: 'NotoSans-Medium',
+                                          color: Colors.white),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            Button("User", Icons.person, () {
+                              setState(() {
+                                main = UserPanel();
+                                Navigator.pop(context);
+                              });
+                            }),
+                            Button("Farm Owner", Icons.home, () {
+                              setState(() {
+                                main = FarmOwnerPanel();
+                                Navigator.pop(context);
+                              });
+                            }),
+                            Button("Setting", Icons.settings, () {
+                              pushScreen(context, () => Setting(model: model));
+                            }),
+                            LogOutSuperAdmin()
+                          ],
+                        );
+                      },
+                    ).toList());
+              },
             )),
         body: main);
   }

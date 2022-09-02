@@ -34,11 +34,11 @@ class LoginScreenState extends State<LoginScreen> {
   String Admin_Pass = "1234567";
   String owner_email = "owner@gmail.com";
   String owner_Pass = "1234567";
-  bool _passwordVisible = false;
+  bool _passwordVisible = true;
 
   @override
   void initState() {
-    _passwordVisible = false;
+    _passwordVisible = true;
   }
 
   @override
@@ -108,8 +108,8 @@ class LoginScreenState extends State<LoginScreen> {
                         splashColor: Colors.transparent,
                         icon: Icon(
                           _passwordVisible
-                              ? Icons.visibility
-                              : Icons.visibility_off,
+                              ? Icons.visibility_off
+                              : Icons.visibility,
                           color: rPrimarycolor,
                         ),
                         onPressed: () {
@@ -211,8 +211,10 @@ class LoginScreenState extends State<LoginScreen> {
 
           loggedInUser.type == "Owner"
               ? pushScreen(context, () => NavigationBarMenu(index: 0))
-              : pushScreen(context, () => BottomNavigationBarMenu(index: 0));
-          ;
+              : loggedInUser.type == "admin"
+                  ? pushScreen(context, () => SuperAdminHome())
+                  : pushScreen(
+                      context, () => BottomNavigationBarMenu(index: 0));
         });
 
         Fluttertoast.showToast(msg: "Login Sucessfully");

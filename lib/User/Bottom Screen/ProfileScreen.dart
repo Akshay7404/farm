@@ -82,20 +82,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 //heightSpace(10),
-                                Row(
-                                  children: [
-                                    Text(document['UserFName'],
-                                        style: TextStyle(
-                                          fontFamily: 'NotoSans-Bold',
-                                          fontSize: 20,
-                                        )),
-                                    Text(document['UserLName'],
-                                        style: TextStyle(
-                                          fontFamily: 'NotoSans-Bold',
-                                          fontSize: 20,
-                                        )),
-                                  ],
-                                ),
+                                Text(
+                                    document['UserFName'] +
+                                        " " +
+                                        document['UserLName'],
+                                    style: TextStyle(
+                                      fontFamily: 'NotoSans-Bold',
+                                      fontSize: 20,
+                                    )),
+
                                 Text(document['PhoneNumber'],
                                     style: normalStyle),
                               ],
@@ -118,10 +113,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
-                                Icon(
-                                  Icons.edit,
-                                  color: rGrey,
-                                ),
+                                Icon(Icons.edit, color: rGrey),
                                 SizedBox(
                                   width: 15,
                                 ),

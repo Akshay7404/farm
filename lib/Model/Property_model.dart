@@ -26,6 +26,7 @@ class PropertyModel {
   List<dynamic>? Terms_and_Ruls;
   List<dynamic>? PropertyImage;
   String? documentid;
+  String? Review;
 
   PropertyModel(
       {this.OwnerId,
@@ -54,7 +55,8 @@ class PropertyModel {
       this.Amenities,
       this.Terms_and_Ruls,
       this.PropertyImage,
-      this.documentid});
+      this.documentid,
+      this.Review});
 
   factory PropertyModel.fromMap(Map<String, dynamic> map) {
     return PropertyModel(
@@ -84,8 +86,10 @@ class PropertyModel {
         Amenities: map['Amenities'],
         Terms_and_Ruls: map['Terms_and_Ruls'],
         PropertyImage: map['PropertyImage'],
-        documentid: map['documentid']);
+        documentid: map['documentid'],
+        Review: map['Review']);
   }
+
   Map<String, dynamic> toMap() {
     return {
       'OwnerId': OwnerId,
@@ -115,6 +119,7 @@ class PropertyModel {
       'Terms_and_Ruls': Terms_and_Ruls,
       'PropertyImage': PropertyImage,
       'documentid': documentid,
+      'Review': Review
     };
   }
 }

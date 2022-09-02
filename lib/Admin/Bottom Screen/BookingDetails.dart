@@ -1,11 +1,13 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:flutter/material.dart';
+import 'package:resortbooking/Admin/Bottom%20Screen/temp.dart';
 import 'package:resortbooking/Model/PayonFarm.dart';
 import 'package:resortbooking/Model/Property_model.dart';
 import 'package:resortbooking/Model/user_model.dart';
 import 'package:resortbooking/User/Common/Color.dart';
 import 'package:resortbooking/User/Common/Constant.dart';
+import 'package:resortbooking/User/Common/Navigators.dart';
 import 'package:resortbooking/User/Common/Style.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -51,87 +53,76 @@ class _BookingHistory_AdminState extends State<BookingHistory_Admin> {
           stream: FirebaseFirestore.instance.collection('Payment').snapshots(),
           builder:
               (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot1) {
-            return StreamBuilder(
-              stream:
-                  FirebaseFirestore.instance.collection('Property').snapshots(),
-              builder: (BuildContext context,
-                  AsyncSnapshot<QuerySnapshot> snapshot2) {
-                List<PaymentProoerty?> list = snapshot1.data!.docs
-                    .map((document) => PaymentProoerty.fromMap(
-                        document.data() as Map<String, dynamic>))
-                    .toList();
-                List<PropertyModel?> list2 = snapshot2.data!.docs
-                    .map((document) => PropertyModel.fromMap(
-                        document.data() as Map<String, dynamic>))
-                    .toList();
+            if (snapshot1.connectionState == ConnectionState.waiting) {
+              return Center(
+                child: CircularProgressIndicator(),
+              );
+            }
 
-                if (snapshot1.connectionState == ConnectionState.waiting) {
-                  return Center(
-                    child: CircularProgressIndicator(),
-                  );
-                }
-                if (snapshot2.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator());
-                }
+            List<PaymentProoerty?> list = snapshot1.data!.docs
+                .map((document) => PaymentProoerty.fromMap(
+                    document.data() as Map<String, dynamic>))
+                .toList();
 
-                return ListView.builder(
-                  itemCount: list.length,
-                  itemBuilder: (context, index) {
-                    print("id" + "${list[index]?.PropertyId}");
-                    return list[index]?.PropertyId ==
-                            FirebaseAuth.instance.currentUser!.uid
-                        ? Container(
-                            padding: EdgeInsets.only(left: 10, right: 10),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+            return ListView.builder(
+              itemCount: list.length,
+              itemBuilder: (context, index) {
+                print("id" + "${list[index]?.PropertyId}");
+                return list[index]?.PropertyId ==
+                        FirebaseAuth.instance.currentUser!.uid
+                    ? Container(
+                        padding: EdgeInsets.only(left: 10, right: 10),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
                               children: [
-                                Row(
-                                  children: [
-                                    Container(
-                                      height: 60,
-                                      width: 60,
-                                      child: ClipRRect(
-                                        borderRadius: BorderRadius.circular(10),
-                                        child: Image.network(
-                                            "${list[index]?.profileUrl}",
-                                            fit: BoxFit.fill),
-                                      ),
-                                    ),
-                                    Container(
-                                      margin:
-                                          EdgeInsets.only(left: 10, right: 10),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text('${list[index]?.Name}',
-                                              style: TextStyle(
-                                                  fontFamily: 'NotoSans-Bold')),
-                                          Text("${list[index]?.Email}",
-                                              style: normalStyle),
-                                          Text("${list[index]?.PhoneNumber}",
-                                              style: normalStyle),
-                                          Text("${list[index]?.PropertyName}",
-                                              style: TextStyle(
-                                                  fontFamily:
-                                                      'NotoSans-Medium')),
-                                          Text("${list[index]?.selectdate}",
-                                              style: TextStyle(
-                                                  fontFamily: 'NotoSans-Medium',
-                                                  color: rGrey,
-                                                  fontSize: 13)),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
+                                Container(
+                                  height: 60,
+                                  width: 60,
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: Image.network(
+                                        "${list[index]?.profileUrl}",
+                                        fit: BoxFit.fill),
+                                  ),
                                 ),
-                                thinAppDevider(),
+                                Container(
+                                  margin: EdgeInsets.only(left: 10, right: 10),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text('${list[index]?.Name}',
+                                          style: TextStyle(
+                                              fontFamily: 'NotoSans-Bold')),
+                                      Text("${list[index]?.Email}",
+                                          style: normalStyle),
+                                      Text("${list[index]?.PhoneNumber}",
+                                          style: normalStyle),
+                                      Text("${list[index]?.PropertyName}",
+                                          style: TextStyle(
+                                              fontFamily: 'NotoSans-Medium')),
+                                      Text("${list[index]?.selectdate}",
+                                          style: TextStyle(
+                                              fontFamily: 'NotoSans-Medium',
+                                              color: rGrey,
+                                              fontSize: 13)),
+                                    ],
+                                  ),
+                                ),
                               ],
                             ),
-                          )
-                        : SizedBox();
-                  },
-                );
+                            thinAppDevider(),
+                            TextButton(
+                                onPressed: () {
+                                  pushScreen(context, () => temp());
+                                },
+                                child: Text("click me"))
+                          ],
+                        ),
+                      )
+                    : SizedBox();
               },
             );
           },

@@ -58,7 +58,10 @@ class MyApp extends StatelessWidget {
               print(usermodel.type);
               usermodel.type == "Owner"
                   ? pushScreen(context, () => NavigationBarMenu(index: 0))
-                  : pushScreen(context, () => SuperAdminHome());
+                  : usermodel.type == "admin"
+                      ? pushScreen(context, () => SuperAdminHome())
+                      : pushScreen(
+                          context, () => BottomNavigationBarMenu(index: 0));
             },
           );
           return Center(child: CircularProgressIndicator());

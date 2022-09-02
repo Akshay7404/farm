@@ -37,7 +37,7 @@ class details_farm extends StatefulWidget {
 }
 
 class _details_farmState extends State<details_farm> {
-  static final _containerHeight = 500.0;
+  static final _containerHeight = 600.0;
   var _fromTop = -_containerHeight;
   ScrollController _controller = ScrollController();
   var _allowReverse = true, _allowForward = true;
@@ -45,6 +45,7 @@ class _details_farmState extends State<details_farm> {
   var _prevForwardOffset = -_containerHeight;
   var _prevReverseOffset = 0.0;
   bool BackToTop = false;
+
   @override
   void initState() {
     super.initState();
@@ -61,6 +62,7 @@ class _details_farmState extends State<details_farm> {
   String? DiscountPrice;
   PropertyModel property = PropertyModel();
   Usermodel _usermodel = Usermodel();
+
   void _listener() {
     double offset = _controller.offset;
     var direction = _controller.position.userScrollDirection;
@@ -93,7 +95,6 @@ class _details_farmState extends State<details_farm> {
 
   User? user = FirebaseAuth.instance.currentUser;
   Usermodel usermodel = Usermodel();
-  
 
   @override
   Widget build(BuildContext context) {
@@ -118,7 +119,8 @@ class _details_farmState extends State<details_farm> {
                     ),
                     actions: [
                       CircleAvatar(
-                          maxRadius: 25,       backgroundColor: Colors.white,
+                          maxRadius: 25,
+                          backgroundColor: Colors.white,
                           child: LikeButton(
                             padding: EdgeInsets.only(left: 9, top: 7),
                             likeBuilder: (bool isLiked) {
@@ -127,7 +129,6 @@ class _details_farmState extends State<details_farm> {
                                 color: isLiked ? rPrimarycolor : Colors.grey,
                               );
                             },
-                           
                           )),
                       widthSpace(9)
                     ],
@@ -241,7 +242,6 @@ class _details_farmState extends State<details_farm> {
                             ));
                           }),
                     ),
-                 
                   ],
                 ),
               ),

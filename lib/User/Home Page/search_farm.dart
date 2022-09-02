@@ -44,6 +44,7 @@ class _SearchFilterState extends State<SearchFilter> {
   final TextEditingController SelectAreaController = TextEditingController();
   late String dateCount;
   late String range;
+
   @override
   void initState() {
     dateCount = '';
@@ -345,6 +346,7 @@ class _SearchFilterState extends State<SearchFilter> {
   Widget AreaItem() {
     return DropdownButtonHideUnderline(
       child: DropdownButton2(
+        dropdownWidth: 100,
         buttonDecoration: BoxDecoration(
             borderRadius: BorderRadius.circular(8), color: Colors.white),
         hint: Text('Select Area', style: textfieldStyle),

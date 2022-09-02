@@ -42,6 +42,8 @@ class _SearchScreenState extends State<SearchScreen> {
     return Scaffold(
       //backgroundColor: Colors.white,
       body: SingleChildScrollView(
+
+      scrollDirection: Axis.vertical,
         child: Container(
           padding: EdgeInsets.only(left: 20, right: 20),
           child: Column(
@@ -111,9 +113,9 @@ class _SearchScreenState extends State<SearchScreen> {
                     return Center(child: CircularProgressIndicator());
                   }
                   return ListView(
+                   shrinkWrap: true,
                     controller: controller,
                     padding: EdgeInsets.zero,
-                    shrinkWrap: true,
                     children: snapshot.data!.docs.map((document) {
                       PropertyModel propertyModel = PropertyModel.fromMap(
                           document.data() as Map<String, dynamic>);

@@ -1,8 +1,14 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, sort_child_properties_last
 
 import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:resortbooking/Model/user_model.dart';
+import 'package:resortbooking/SuperAdmin/User%20Panel/UserDetails.dart';
 import 'package:resortbooking/User/Common/Color.dart';
 import 'package:resortbooking/User/Common/Constant.dart';
 import 'package:image_picker/image_picker.dart';
@@ -11,13 +17,23 @@ import 'package:resortbooking/User/Common/TextField.dart';
 import 'package:bouncing_widget/bouncing_widget.dart';
 
 class Setting extends StatefulWidget {
-  const Setting({Key? key}) : super(key: key);
+  final Usermodel model;
+
+  const Setting({Key? key, required this.model}) : super(key: key);
 
   @override
   State<Setting> createState() => _SettingState();
 }
 
 class _SettingState extends State<Setting> {
+  Usermodel usermodel = Usermodel();
+
+  @override
+  void initState() {
+    usermodel = widget.model;
+    super.initState();
+  }
+
   BuildContext? secondcontax;
   File? image;
   String? imagePath;
@@ -25,8 +41,6 @@ class _SettingState extends State<Setting> {
   final UserNameController = TextEditingController();
   final EmailController = TextEditingController();
   final PhoneNumberController = TextEditingController();
-  final DateController = TextEditingController();
-  final AddressController = TextEditingController();
 
   final _form = GlobalKey<FormState>();
 
@@ -103,8 +117,8 @@ class _SettingState extends State<Setting> {
                                     height: 300,
                                     width: 500,
                                     child: ClipOval(
-                                        child: Image.asset(
-                                            "assets/image/ic_effiletower.jpeg",
+                                        child: Image.network(
+                                            "${usermodel.ProfilePic}",
                                             fit: BoxFit.fill)),
                                   ),
                             radius: 70,
@@ -319,7 +333,7 @@ class _SettingState extends State<Setting> {
                     BouncingWidget(
                       onPressed: () {
                         if (_form.currentState!.validate()) {
-                          null;
+                          UpadeAdminProfile();
                         } else {
                           null;
                         }
@@ -344,5 +358,31 @@ class _SettingState extends State<Setting> {
         ),
       ),
     );
+  }
+
+  UpadeAdminProfile() async {
+    FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
+    User? user = FirebaseAuth.instance.currentUser;
+    final userid = user!.uid;
+    UploadTask task = FirebaseStorage.instance
+        .ref('SuperAdminPic')
+        .child(userid)
+        .child(usermodel.UserId.toString())
+        .putFile(image!);
+
+    TaskSnapshot snapshot = await task;
+    String? imageUrl = await snapshot.ref.getDownloadURL();
+
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .update({
+      'UserFName': UserNameController.text,
+      'UserEMail': EmailController.text,
+      'PhoneNumber': PhoneNumberController.text,
+      'ProfilePic': imageUrl,
+    });
+    Fluttertoast.showToast(msg: "Updated Successfully :) ");
+    Navigator.pop(context);
   }
 }

@@ -265,7 +265,11 @@ Widget FarmDetails(PropertyModel propertyModel, String? discountPrice) {
                     )),
                 Spacer(),
                 InkWell(
-                  onTap: () => pushScreen(context, () => reviews()),
+                  onTap: () => pushScreen(
+                      context,
+                      () => reviews(
+                            property: propertyModel,
+                          )),
                   child: Text(
                     "View All ",
                     style: TextStyle(

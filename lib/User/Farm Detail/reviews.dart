@@ -1,64 +1,39 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:resortbooking/Model/FarmOwner_model.dart';
+import 'package:resortbooking/Model/Property_model.dart';
 import 'package:resortbooking/Model/User%20Review%20Room.dart';
 import 'package:resortbooking/Model/UserReview_model.dart';
 import 'package:resortbooking/Model/user_model.dart';
 import 'package:resortbooking/User/Common/Color.dart';
-import 'package:resortbooking/User/Common/Constant.dart';
-import 'package:resortbooking/User/Common/Style.dart';
-import 'package:like_button/like_button.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:resortbooking/User/Common/TextField.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:resortbooking/main.dart';
 
 class reviews extends StatefulWidget {
-  const reviews({Key? key}) : super(key: key);
+  final PropertyModel property;
+
+  const reviews({Key? key, required this.property}) : super(key: key);
 
   @override
   State<reviews> createState() => _reviewsState();
 }
 
-Usermodel targetuser = Usermodel();
-UserReviewRoom? reviewRoom;
-
 class _reviewsState extends State<reviews> {
-  FarmOwnermodel usermodel = FarmOwnermodel();
-
-  Future<UserReviewRoom?> getReviewModel(Usermodel targetuser) async {
-    QuerySnapshot snapshot = await FirebaseFirestore.instance
-        .collection('UserReview')
-        .where("Participants.${usermodel.FarmOwnerId}", isEqualTo: true)
-        .where("Participants.${targetuser.UserId}", isEqualTo: true)
-        .get();
-
-    if (snapshot.docs.length > 0) {
-      var docData = snapshot.docs[0].data();
-      UserReviewRoom Existingreviewroom =
-          UserReviewRoom.fromMap(docData as Map<String, dynamic>);
-
-      reviewRoom = Existingreviewroom;
-    } else {
-      UserReviewRoom newreviewRoom = UserReviewRoom(
-          Roomid: uuid.v1(),
-          Participants: {
-            usermodel.FarmOwnerId.toString(): true,
-            targetuser.UserId.toString(): true
-          });
-      await FirebaseFirestore.instance
-          .collection('UserReview')
-          .doc(newreviewRoom.Roomid)
-          .set(newreviewRoom.toMap());
-
-      reviewRoom = newreviewRoom;
-    }
-    return reviewRoom;
+  @override
+  void initState() {
+    propertyModel = widget.property;
+    super.initState();
   }
 
+  Usermodel targetuser = Usermodel();
+  UserReviewRoom? reviewRoom;
+  Usermodel usermodel = Usermodel();
+  PropertyModel propertyModel = PropertyModel();
+
   @override
-  bool isvisiable = true;
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -78,28 +53,30 @@ class _reviewsState extends State<reviews> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                child: Row(
-                  children: [
-                    Flexible(
-                        child: Container(
-                            decoration: BoxDecoration(boxShadow: [
-                              BoxShadow(
-                                  blurRadius: 25,
-                                  color: Colors.black12,
-                                  offset: Offset(5, 5))
-                            ]),
-                            child: appTextField(
-                                textEditingController: message,
-                                hintText: "Enter Messgae",
-                                maxlines: null))),
-                    IconButton(
-                        onPressed: () {},
-                        icon: FaIcon(FontAwesomeIcons.paperPlane,
-                            color: rPrimarycolor, size: 30))
-                  ],
-                ),
+              Row(
+                children: [
+                  Flexible(
+                      child: Container(
+                          decoration: BoxDecoration(boxShadow: [
+                            BoxShadow(
+                                blurRadius: 25,
+                                color: Colors.black12,
+                                offset: Offset(5, 5))
+                          ]),
+                          child: appTextField(
+                              textEditingController: message,
+                              hintText: "Enter Messgae",
+                              maxlines: null))),
+                  IconButton(
+                      onPressed: () {
+                        getReviewModel(targetuser);
+                      },
+                      icon: FaIcon(FontAwesomeIcons.paperPlane,
+                          color: rPrimarycolor, size: 30))
+                ],
               ),
+              Text("${FirebaseAuth.instance.currentUser!.uid}"),
+              Text("${propertyModel.Name}")
             ],
           ),
         ),
@@ -115,7 +92,7 @@ class _reviewsState extends State<reviews> {
     if (msg != "") {
       UserReviewModel model = UserReviewModel(
           messageid: uuid.v1(),
-          sender: targetuser.UserId,
+          sender: propertyModel.OwnerId,
           timestamp: DateTime.now(),
           text: msg);
 
@@ -126,6 +103,36 @@ class _reviewsState extends State<reviews> {
           .doc(model.messageid)
           .set(model.toMap());
     }
+  }
+
+  Future<UserReviewRoom?> getReviewModel(Usermodel targetuser) async {
+    QuerySnapshot snapshot = await FirebaseFirestore.instance
+        .collection('UserReview')
+        .where("Participants.${FirebaseAuth.instance.currentUser!.uid}",
+            isEqualTo: true)
+        .where("Participants.${propertyModel.OwnerId}", isEqualTo: true)
+        .get();
+
+    if (snapshot.docs.length > 0) {
+      var docData = snapshot.docs[0].data();
+      UserReviewRoom Existingreviewroom =
+          UserReviewRoom.fromMap(docData as Map<String, dynamic>);
+
+      reviewRoom = Existingreviewroom;
+    } else {
+      UserReviewRoom newreviewRoom =
+          UserReviewRoom(Roomid: uuid.v1(), Participants: {
+        FirebaseAuth.instance.currentUser!.uid.toString(): true,
+        propertyModel.OwnerId.toString(): true
+      });
+      await FirebaseFirestore.instance
+          .collection('UserReview')
+          .doc(newreviewRoom.Roomid)
+          .set(newreviewRoom.toMap());
+
+      reviewRoom = newreviewRoom;
+    }
+    return reviewRoom;
   }
 }
 //  Container(
@@ -193,3 +200,33 @@ class _reviewsState extends State<reviews> {
 //                   ],
 //                 ),
 //               ),
+
+// Future<UserReviewRoom?> getReviewModel(Usermodel targetuser) async {
+//   QuerySnapshot snapshot = await FirebaseFirestore.instance
+//       .collection('UserReview')
+//       .where("Participants.${usermodel.UserId}", isEqualTo: true)
+//       .where("Participants.${targetuser.UserId}", isEqualTo: true)
+//       .get();
+//
+//   if (snapshot.docs.length > 0) {
+//     var docData = snapshot.docs[0].data();
+//     UserReviewRoom Existingreviewroom =
+//     UserReviewRoom.fromMap(docData as Map<String, dynamic>);
+//
+//     reviewRoom = Existingreviewroom;
+//   } else {
+//     UserReviewRoom newreviewRoom = UserReviewRoom(
+//         Roomid: uuid.v1(),
+//         Participants: {
+//           usermodel.UserId.toString(): true,
+//           targetuser.UserId.toString(): true
+//         });
+//     await FirebaseFirestore.instance
+//         .collection('UserReview')
+//         .doc(newreviewRoom.Roomid)
+//         .set(newreviewRoom.toMap());
+//
+//     reviewRoom = newreviewRoom;
+//   }
+//   return reviewRoom;
+// }

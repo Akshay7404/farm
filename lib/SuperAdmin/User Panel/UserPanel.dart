@@ -21,7 +21,10 @@ class _UserPanelState extends State<UserPanel> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: StreamBuilder(
-          stream: FirebaseFirestore.instance.collection('users').where('type',isEqualTo: 'User').snapshots(),
+          stream: FirebaseFirestore.instance
+              .collection('users')
+              .where('type', isEqualTo: 'User')
+              .snapshots(),
           builder:
               (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
             if (!snapshot.hasData) {
@@ -30,9 +33,15 @@ class _UserPanelState extends State<UserPanel> {
             return ListView(
               children: snapshot.data!.docs.map((document) {
                 Usermodel Model =
-                    Usermodel.fromMap(document.data() as Map<String, dynamic>);
+                Usermodel.fromMap(document.data() as Map<String, dynamic>);
                 return InkWell(
-                  onTap: () => pushScreen(context, () => UserDetails(usermodel: Model,)),
+                  onTap: () =>
+                      pushScreen(
+                          context,
+                              () =>
+                              UserDetails(
+                                usermodel: Model,
+                              )),
                   child: Container(
                     margin: EdgeInsets.all(15),
                     child: Column(
@@ -52,7 +61,7 @@ class _UserPanelState extends State<UserPanel> {
                             ),
                             Container(
                               margin:
-                                  EdgeInsets.only(top: 10, left: 10, right: 10),
+                              EdgeInsets.only(top: 10, left: 10, right: 10),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -71,7 +80,8 @@ class _UserPanelState extends State<UserPanel> {
                           ],
                         ),
                         heightSpace(10),
-                        thinAppDevider()
+                        thinAppDevider(),
+
                       ],
                     ),
                   ),

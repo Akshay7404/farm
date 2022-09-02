@@ -1,12 +1,15 @@
 // ignore_for_file: prefer_const_constructors
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:resortbooking/Model/user_model.dart';
 import 'package:resortbooking/User/Common/Color.dart';
 import 'package:resortbooking/User/Common/Constant.dart';
 import 'package:resortbooking/User/Common/Style.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-Widget DeleteFarmOwner() {
+Widget DeleteFarmOwner(Usermodel usermodel) {
   return StatefulBuilder(
     builder: (context, setState) => ElevatedButton(
       style: ElevatedButton.styleFrom(primary: Colors.red.shade50),
@@ -33,7 +36,7 @@ Widget DeleteFarmOwner() {
                               textAlign: TextAlign.center, style: TitleStyle)),
                       Container(
                           margin: EdgeInsets.all(10),
-                          child: Text("You want to Delete Farm Owner.")),
+                          child: Text("You want to Delete ${usermodel.UserFName} ${usermodel.UserLName}.")),
                       thinAppDevider(),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -48,6 +51,7 @@ Widget DeleteFarmOwner() {
                           Container(width: 1, height: 28, color: rGrey),
                           TextButton(
                               onPressed: () {
+                                FirebaseFirestore.instance.collection('users').doc(usermodel.UserId).delete();
                                 Navigator.pop(context);
                               },
                               child: Text("Yes",

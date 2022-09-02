@@ -1,10 +1,15 @@
 // ignore_for_file: prefer_const_constructors
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:resortbooking/User/Common/Color.dart';
 import 'package:resortbooking/User/Common/Constant.dart';
 import 'package:resortbooking/User/Common/Style.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:resortbooking/User/Logout/logout.dart';
+
+import '../../User/Login/LoginScreen.dart';
 
 Widget LogOutSuperAdmin() {
   return StatefulBuilder(
@@ -54,7 +59,7 @@ Widget LogOutSuperAdmin() {
                             Container(width: 1, height: 28, color: rGrey),
                             TextButton(
                                 onPressed: () {
-                                  Navigator.pop(context);
+                                  Logout_user(context);
                                 },
                                 child: Text("Yes",
                                     style: TextStyle(color: Colors.green)))
@@ -76,4 +81,17 @@ Widget LogOutSuperAdmin() {
       ),
     ),
   );
+}
+
+final storage = FlutterSecureStorage();
+
+Future Logout_user(BuildContext context) async {
+  await FirebaseAuth.instance.signOut();
+  await storage.delete(key: "uid");
+  Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(
+        builder: (context) => LoginScreen(),
+      ),
+      (route) => false);
 }
